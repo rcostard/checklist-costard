@@ -54,10 +54,10 @@ h2.d{font-size:15px;color:var(--navy);margin:14px 4px 6px}
 <body>
 <header>
   <h1>COSTARD — Checklist de Campo</h1>
-  <div class="sub"><span>Inspeção HVAC + Elétrica · 044</span><span id="save">—</span></div>
+  <div class="sub"><span>Inspeção HVAC + Elétrica · 044 · R03</span><span id="save">—</span></div>
 </header>
 
-<div class="aviso"><b>Fotos e áudios originais:</b> use a câmera e o gravador nativos e suba tudo no <b>OneDrive da unidade</b> (pasta compartilhada). Este checklist organiza o levantamento e leva miniaturas de referência — não substitui os originais.</div>
+<div class="aviso"><b>Fotos:</b> câmera nativa com <b>Live Photo desligado</b>, fotografando na ordem dos itens — os nomes de arquivo não importam (a numeração é automática). Upload em um lote só, no fim. <b>Áudio:</b> grave no gravador do iPhone e envie a <b>transcrição</b> (áudio original opcional). Originais: OneDrive/SharePoint da unidade ou zip direto.</div>
 
 <!-- GERAL -->
 <section class="sec on" id="s-geral">
@@ -115,7 +115,7 @@ h2.d{font-size:15px;color:var(--navy);margin:14px 4px 6px}
 <section class="sec" id="s-env">
   <div class="card"><h3>Fechar e enviar</h3>
     <div class="cnt" id="cnt2"></div>
-    <p class="muted">O pacote é um arquivo .html único com todo o levantamento + miniaturas + dados estruturados (JSON embutido). Envie ao Roberto por OneDrive, e-mail ou WhatsApp. Os originais das fotos vão pelo OneDrive.</p>
+    <p class="muted">O pacote é um arquivo .html único com o levantamento completo + miniaturas + dados estruturados. As faixas de fotos ("fotos 3–4") são calculadas automaticamente pela ordem dos itens. Envie ao Roberto por OneDrive/SharePoint, e-mail ou WhatsApp, junto com o lote de fotos originais e a transcrição dos áudios.</p>
     <button class="btn" onclick="enviar()">Gerar e compartilhar pacote</button>
     <button class="btn sec2" onclick="baixarJSON()">Baixar somente JSON</button>
     <button class="btn red" onclick="zerar()">Nova inspeção (apaga tudo)</button>
@@ -140,7 +140,7 @@ h2.d{font-size:15px;color:var(--navy);margin:14px 4px 6px}
 const TIPOS_HVAC={"Central de Água Gelada":["Chiller (centrífugo/parafuso)","Bomba — circuito de condensação","Bomba — primário de água gelada","Bomba — secundário de água gelada","Tubulações de água gelada / isolamento","Unidade de tratamento d'água","Torre de resfriamento","Tanque de água gelada","Sala de controle / automação"],"Casas de máquinas / setores":["Fan & Coil","Filtros de ar","Instalações hidráulicas de água gelada","Ventilador / Exaustor","Caixa de ventilação (renovação)","Quadro elétrico / automação","Dutos (insuflação/retorno/renovação)","Splitão vertical","Condensadora split-system","Evaporadora split hi-wall","Giroval / difusores","Veneziana de retorno","Procedimentos operacionais (documentação)","Planta baixa dos setores climatizados"],"Administração / lojas":["Split hi-wall","Split piso/teto"],"Outros":["Outro (descrever)"]};
 const SEQ_ELE=["1 Externa","2 Identif./QR","3 Interna","4 Det. técnico","5 Aterram./seg.","6 Achado"];
 let S=null;
-const NOVO=()=>({v:"R02",geral:{},ana:{},ele:[],hvac:[]});
+const NOVO=()=>({v:"R03",geral:{},ana:{},ele:[],hvac:[]});
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const $=s=>document.querySelector(s);const esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
@@ -151,7 +151,7 @@ function load(){try{S=JSON.parse(localStorage.getItem("cl044"))||NOVO();}catch(e
 
 /* ---------- IndexedDB (miniaturas) ---------- */
 let db=null;
-const idb=new Promise(r=>{const q=indexedDB.open("cl044f",1);q.onupgradeneeded=e=>e.target.result.createObjectStore("f");q.onsuccess=e=>{db=e.target.result;r(db)};q.onerror=()=>r(null);});
+const idb=new Promise(r=>{try{const q=indexedDB.open("cl044f",1);q.onupgradeneeded=e=>e.target.result.createObjectStore("f");q.onsuccess=e=>{db=e.target.result;r(db)};q.onerror=()=>r(null);}catch(e){r(null)}});
 const fput=(k,v)=>idb.then(d=>d&&new Promise(r=>{const t=d.transaction("f","readwrite");t.objectStore("f").put(v,k);t.oncomplete=r;}));
 const fget=k=>idb.then(d=>d?new Promise(r=>{const q=d.transaction("f").objectStore("f").get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null);}):null);
 const fdel=k=>idb.then(d=>d&&new Promise(r=>{const t=d.transaction("f","readwrite");t.objectStore("f").delete(k);t.oncomplete=r;}));
@@ -165,6 +165,7 @@ function bindSimples(){document.querySelectorAll("[data-k]").forEach(el=>{const 
 
 /* ---------- GUT ---------- */
 const gutCls=r=>r==null?"n":r<45?"v":r<100?"a":"r";
+function faixaTxt(o){const all=[...S.ele,...S.hvac].filter(x=>(+x.nf||0)>0).sort((a,b)=>(a.tc||0)-(b.tc||0));let ini=1;for(const x of all){const n=+x.nf||0;if(x.id===o.id)return `fotos ${ini}${n>1?"–"+(ini+n-1):""}`;ini+=n;}return "—";}
 function gutHtml(o){const R=(o.g&&o.u&&o.t)?o.g*o.u*o.t:null;const op=v=>[1,2,3,4,5].map(n=>`<option ${v==n?"selected":""}>${n}</option>`).join("");
 return `<label>G × U × T → resultado</label><div class="gut">
 <select data-g><option value="">G</option>${op(o.g)}</select>
@@ -176,7 +177,7 @@ return `<label>G × U × T → resultado</label><div class="gut">
 function fotoHtml(o){return `<label>Miniaturas de referência (opcional — originais no OneDrive)</label>
 <input type="file" accept="image/*" multiple data-foto style="font-size:12px">
 <div class="fotos" data-fotos></div>
-<label>Nº das fotos na câmera nativa (ex.: IMG_4532–4540)</label><input type="text" data-f="refs" value="${esc(o.refs)}" placeholder="faixa de fotos correspondente">`;}
+<label>Fotos deste item (quantas?)</label><div class="gut"><button type="button" class="nfbtn" data-nf="-1" style="border:0;border-radius:8px;background:#e8ecef;font-size:18px;font-weight:800;width:52px;padding:8px">−</button><input type="number" inputmode="numeric" min="0" data-f="nf" value="${esc(o.nf??"")}" style="text-align:center"><button type="button" class="nfbtn" data-nf="1" style="border:0;border-radius:8px;background:#e8ecef;font-size:18px;font-weight:800;width:52px;padding:8px">+</button><div class="res n" style="min-width:96px;font-size:12px" data-faixa>${faixaTxt(o)}</div></div>`;}
 function wireFotos(card,o){const inp=card.querySelector("[data-foto]");const box=card.querySelector("[data-fotos]");o.fotos=o.fotos||[];
 const paint=()=>{box.innerHTML="";o.fotos.forEach(k=>{const img=document.createElement("img");fget(k).then(d=>{if(d)img.src=d;});img.onclick=()=>{if(confirm("Remover miniatura?")){o.fotos=o.fotos.filter(x=>x!==k);fdel(k);save();paint();}};box.appendChild(img);});};
 paint();
@@ -192,12 +193,14 @@ function ncHtml(o,dl){return `<div class="row"><div><label>Condição</label>
 ${gutHtml(o)}
 <label>Observações</label><textarea data-f="obs">${esc(o.obs)}</textarea>${fotoHtml(o)}`;}
 
-function wireCard(card,o,rerender){card.querySelectorAll("[data-f]").forEach(el=>{el.oninput=()=>{o[el.dataset.f]=el.value;save();cont();};});
+function wireCard(card,o,rerender){card.querySelectorAll("[data-f]").forEach(el=>{el.oninput=()=>{o[el.dataset.f]=el.value;o.tu=Date.now();save();cont();};});
+const nfin=card.querySelector('[data-f="nf"]');if(nfin){nfin.onchange=()=>{o.nf=Math.max(0,+nfin.value||0);o.tu=Date.now();save();rerender();};}
+card.querySelectorAll(".nfbtn").forEach(b=>{b.onclick=()=>{o.nf=Math.max(0,(+o.nf||0)+(+b.dataset.nf));o.tu=Date.now();save();rerender();};});
 ["g","u","t"].forEach(k=>{const el=card.querySelector(`[data-${k}]`);if(el)el.onchange=()=>{o[k]=+el.value||"";save();rerender();};});
 wireFotos(card,o);}
 
 /* ---------- ELÉTRICA ---------- */
-function addEle(){S.ele.push({id:uid(),local:"",pav:"",area:"",cod:"",seq:[0,0,0,0,0,0],cond:"",desc:"",cons:"",risco:"",g:"",u:"",t:"",refs:"",obs:"",fotos:[]});save();renderEle();}
+function addEle(){S.ele.push({id:uid(),tc:Date.now(),nf:"",local:"",pav:"",area:"",cod:"",seq:[0,0,0,0,0,0],cond:"",desc:"",cons:"",risco:"",g:"",u:"",t:"",refs:"",obs:"",fotos:[]});save();renderEle();}
 function renderEle(){const L=$("#lista-ele");L.innerHTML="";S.ele.forEach((o,i)=>{const c=document.createElement("div");c.className="item";
 c.innerHTML=`<div class="top"><b>Quadro ${i+1}</b><button class="del">remover</button></div>
 <label>Local</label><input type="text" data-f="local" list="dl-local" value="${esc(o.local)}">
@@ -211,7 +214,7 @@ c.querySelectorAll("[data-seq]").forEach(ch=>{ch.onchange=()=>{o.seq[+ch.dataset
 wireCard(c,o,renderEle);L.appendChild(c);});cont();}
 
 /* ---------- HVAC ---------- */
-function addHvac(){S.hvac.push({id:uid(),tipo:"",setor:"",cod:"",cond:"",desc:"",cons:"",risco:"",g:"",u:"",t:"",refs:"",obs:"",fotos:[]});save();renderHvac();}
+function addHvac(){S.hvac.push({id:uid(),tc:Date.now(),nf:"",tipo:"",setor:"",cod:"",cond:"",desc:"",cons:"",risco:"",g:"",u:"",t:"",refs:"",obs:"",fotos:[]});save();renderHvac();}
 function renderHvac(){const L=$("#lista-hvac");L.innerHTML="";S.hvac.forEach((o,i)=>{const c=document.createElement("div");c.className="item";
 const opts=Object.entries(TIPOS_HVAC).map(([g,arr])=>`<optgroup label="${g}">`+arr.map(t=>`<option ${o.tipo==t?"selected":""}>${t}</option>`).join("")+`</optgroup>`).join("");
 c.innerHTML=`<div class="top"><b>Item ${i+1}</b><button class="del">remover</button></div>
@@ -232,7 +235,7 @@ $("#cnt").innerHTML=h;$("#cnt2").innerHTML=h;}
 async function pacoteHtml(){const g=S.geral,d=new Date();
 const linha=async(o,extra)=>{const R=(o.g&&o.u&&o.t)?o.g*o.u*o.t:null;const cls=gutCls(R);
 let th="";for(const k of (o.fotos||[])){const dt=await fget(k);if(dt)th+=`<img src="${dt}" style="width:110px;height:110px;object-fit:cover;border-radius:6px;margin:2px;border:1px solid #ccc">`;}
-return `<tr><td>${extra}</td><td>${esc(o.cond)}</td><td>${esc(o.desc)}<br><i style="color:#666">${esc(o.cons)}</i>${o.obs?`<br><small>${esc(o.obs)}</small>`:""}</td><td>${esc(o.risco)}</td><td style="text-align:center;font-weight:700;color:#fff;background:${cls=="v"?"#1e8e3e":cls=="a"?"#e8a200":cls=="r"?"#c5221f":"#9aa4ad"}">${R??"—"}</td><td>${esc(o.refs)}</td></tr>`+(th?`<tr><td colspan="6">${th}</td></tr>`:"");};
+return `<tr><td>${extra}</td><td>${esc(o.cond)}</td><td>${esc(o.desc)}<br><i style="color:#666">${esc(o.cons)}</i>${o.obs?`<br><small>${esc(o.obs)}</small>`:""}</td><td>${esc(o.risco)}</td><td style="text-align:center;font-weight:700;color:#fff;background:${cls=="v"?"#1e8e3e":cls=="a"?"#e8a200":cls=="r"?"#c5221f":"#9aa4ad"}">${R??"—"}</td><td>${faixaTxt(o)}${o.refs?" · "+esc(o.refs):""}</td></tr>`+(th?`<tr><td colspan="6">${th}</td></tr>`:"");};
 let te="";for(let i=0;i<S.ele.length;i++){const o=S.ele[i];te+=await linha(o,`<b>Q${i+1}</b> ${esc(o.local)} · ${esc(o.pav)} · ${esc(o.area)}<br><small>Cód: ${esc(o.cod)} · Fotos seq.: ${o.seq.filter(Boolean).length}/6</small>`);}
 let th2="";for(let i=0;i<S.hvac.length;i++){const o=S.hvac[i];th2+=await linha(o,`<b>${i+1}</b> ${esc(o.tipo)}<br><small>${esc(o.setor)} · TAG: ${esc(o.cod)}</small>`);}
 const ana=Object.entries({a1:"Idade/intervenções",a2:"Mantenedora",a3:"PMOC/ART",a4:"Contratos",a5:"Ocorrências",a6:"Documentação",a7:"BMS/CCM",a8:"Acesso",a9:"Outras"}).map(([k,t])=>S.ana[k]?`<tr><td><b>${t}</b></td><td>${esc(S.ana[k])}</td></tr>`:"").join("");
@@ -245,7 +248,7 @@ ${g.obs?`<p><b>Observações gerais:</b> ${esc(g.obs)}</p>`:""}
 <h2>Anamnese</h2><table ${tbl}>${ana||"<tr><td>—</td></tr>"}</table>
 <h2>Elétrica — quadros (${S.ele.length})</h2><table ${tbl}><tr><th>Quadro/local</th><th>Cond.</th><th>Descrição</th><th>Risco</th><th>G×U×T</th><th>Fotos câmera</th></tr>${te||""}</table>
 <h2>HVAC — itens (${S.hvac.length})</h2><table ${tbl}><tr><th>Item/tipo</th><th>Cond.</th><th>Descrição</th><th>Risco</th><th>G×U×T</th><th>Fotos câmera</th></tr>${th2||""}</table>
-<p style="font-size:11px;color:#777">Gerado em ${d.toLocaleString("pt-BR")} pelo Checklist de Campo Costard R02. Originais de fotos/áudio: OneDrive da unidade. Dados estruturados embutidos abaixo (JSON) para processamento.</p>
+<p style="font-size:11px;color:#777">Gerado em ${d.toLocaleString("pt-BR")} pelo Checklist de Campo Costard R03. Originais de fotos/áudio: OneDrive da unidade. Dados estruturados embutidos abaixo (JSON) para processamento.</p>
 <script type="application/json" id="dados-json">${JSON.stringify(S).replace(/</g,"\\u003c")}<\/script></body></html>`;}
 function nomeBase(){const g=S.geral;return `Levantamento_044_${g.site||"SITE"}_${g.data||new Date().toISOString().slice(0,10)}`;}
 async function enviar(){const html=await pacoteHtml();const f=new File([html],nomeBase()+".html",{type:"text/html"});
@@ -256,7 +259,9 @@ function baixar(txt,nome,tipo){const a=document.createElement("a");a.href=URL.cr
 function zerar(){if(confirm("Apagar TODO o levantamento deste aparelho?")&&confirm("Tem certeza? Esta ação não pode ser desfeita.")){localStorage.removeItem("cl044");fclear();location.reload();}}
 
 /* ---------- init ---------- */
+let storageOk=true;try{localStorage.setItem("__t","1");localStorage.removeItem("__t")}catch(e){storageOk=false}
 load();bindSimples();renderEle();renderHvac();cont();
+if(!storageOk)document.querySelector("header").insertAdjacentHTML("afterend",'<div class="aviso" style="border-left-color:#c5221f"><b>Este modo de abertura não salva dados</b> (visualizador de arquivos). Abra a URL oficial no Safari/Chrome: https://rcostard.github.io/checklist-costard/</div>');
 if(!S.geral.data){S.geral.data=new Date().toISOString().slice(0,10);save();bindSimples();}
 </script>
 </body>
