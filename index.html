@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1D3563">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Checklist de Campo 044 — Costard</title>
+<style>
+:root{--navy:#1D3563;--teal:#00A0AC;--graf:#2C2C2C;--bg:#F4F6F8;--ok:#1e8e3e;--warn:#e8a200;--bad:#c5221f;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--graf);padding-bottom:70px}
+header{background:var(--navy);color:#fff;padding:12px 14px;position:sticky;top:0;z-index:10}
+header h1{margin:0;font-size:16px;letter-spacing:.5px}
+header .sub{font-size:11px;opacity:.85;display:flex;justify-content:space-between;margin-top:2px}
+#save{color:#9fe8ee}
+.aviso{background:#fff8e1;border-left:4px solid var(--warn);padding:8px 12px;font-size:12px;margin:10px;border-radius:6px}
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:#fff;border-top:1px solid #ddd;z-index:10;padding-bottom:env(safe-area-inset-bottom)}
+.tabs button{flex:1;border:0;background:none;padding:9px 2px 7px;font-size:11px;color:#777}
+.tabs button.on{color:var(--teal);font-weight:700;border-top:3px solid var(--teal)}
+.sec{display:none;padding:10px}
+.sec.on{display:block}
+.card{background:#fff;border-radius:10px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.card h3{margin:0 0 8px;font-size:14px;color:var(--navy)}
+label{display:block;font-size:12px;font-weight:600;margin:8px 0 3px;color:#444}
+input[type=text],input[type=date],input[type=time],input[type=number],select,textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:15px;background:#fff}
+textarea{min-height:60px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.btn{display:inline-block;border:0;border-radius:8px;padding:12px 14px;font-size:14px;font-weight:700;background:var(--teal);color:#fff;width:100%;margin-top:8px}
+.btn.sec2{background:var(--navy)}.btn.ghost{background:#e8ecef;color:var(--graf)}.btn.red{background:var(--bad)}
+.item{border:1px solid #dde3e8;border-radius:10px;padding:10px;margin-top:10px;background:#fbfcfd}
+.item .top{display:flex;justify-content:space-between;align-items:center}
+.item .del{background:none;border:0;color:var(--bad);font-size:12px;font-weight:700;padding:4px}
+.gut{display:flex;gap:6px;align-items:center}
+.gut select{flex:1}
+.res{min-width:64px;text-align:center;border-radius:8px;padding:10px 4px;font-weight:800;color:#fff}
+.res.v{background:var(--ok)}.res.a{background:var(--warn)}.res.r{background:var(--bad)}.res.n{background:#9aa4ad}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.chip{font-size:11px;padding:5px 8px;border-radius:14px;background:#e8f6f7;border:1px solid var(--teal);color:#046a72}
+.chip input{margin-right:4px}
+.fotos{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.fotos img{width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid #ccc}
+.cnt{display:flex;gap:8px;margin:8px 0}
+.cnt div{flex:1;background:#fff;border-radius:8px;padding:8px;text-align:center;font-size:12px;box-shadow:0 1px 2px rgba(0,0,0,.07)}
+.cnt b{display:block;font-size:18px}
+details{background:#eef4f5;border-radius:8px;padding:8px 10px;margin:8px 0;font-size:12px}
+summary{font-weight:700;color:var(--navy);cursor:pointer}
+.badge{font-size:10px;background:var(--navy);color:#fff;border-radius:10px;padding:2px 7px;margin-left:6px}
+h2.d{font-size:15px;color:var(--navy);margin:14px 4px 6px}
+.muted{font-size:11px;color:#888}
+</style>
+</head>
+<body>
+<header>
+  <h1>COSTARD — Checklist de Campo</h1>
+  <div class="sub"><span>Inspeção HVAC + Elétrica · 044</span><span id="save">—</span></div>
+</header>
+
+<div class="aviso"><b>Fotos e áudios originais:</b> use a câmera e o gravador nativos e suba tudo no <b>OneDrive da unidade</b> (pasta compartilhada). Este checklist organiza o levantamento e leva miniaturas de referência — não substitui os originais.</div>
+
+<!-- GERAL -->
+<section class="sec on" id="s-geral">
+  <div class="card"><h3>Dados gerais</h3>
+    <label>Inspetor</label>
+    <select data-k="geral.inspetor"><option value="">—</option><option>Roberto</option><option>Julio</option><option>Outro</option></select>
+    <div class="row">
+      <div><label>Unidade (sigla)</label>
+      <select data-k="geral.site"><option value="">—</option><option>VPQ</option><option>BNM</option><option>GVN</option><option>MTC</option><option>PAR</option><option>TST</option><option>OUTRA</option></select></div>
+      <div><label>Data</label><input type="date" data-k="geral.data"></div>
+    </div>
+    <label>Nome da unidade / observação</label><input type="text" data-k="geral.unidade" placeholder="preencher em campo">
+    <div class="row">
+      <div><label>Início</label><input type="time" data-k="geral.hIni"></div>
+      <div><label>Término</label><input type="time" data-k="geral.hFim"></div>
+    </div>
+    <label>Acompanhante local (nome/função/contato)</label><input type="text" data-k="geral.acomp">
+    <label>Condições gerais / observações</label><textarea data-k="geral.obs"></textarea>
+  </div>
+  <div class="card"><h3>Progresso</h3><div class="cnt" id="cnt"></div><div class="muted">Verde/amarelo/vermelho = resultado G×U×T (&lt;45 / 45–99 / ≥100), aproximação das bandas observadas nos relatórios-modelo.</div></div>
+</section>
+
+<!-- ANAMNESE -->
+<section class="sec" id="s-anamnese">
+  <div class="card"><h3>Anamnese (entrevista inicial)</h3>
+    <label>Idade das instalações / últimas grandes intervenções</label><textarea data-k="ana.a1"></textarea>
+    <label>Equipe de manutenção / mantenedora atual (própria? terceirizada? quem?)</label><textarea data-k="ana.a2"></textarea>
+    <label>PMOC em dia? Responsável técnico? ART?</label><textarea data-k="ana.a3"></textarea>
+    <label>Contratos de manutenção vigentes (HVAC, elétrica, subestação, geradores)</label><textarea data-k="ana.a4"></textarea>
+    <label>Ocorrências recentes (quedas de energia, paradas, vazamentos, autuações)</label><textarea data-k="ana.a5"></textarea>
+    <label>Documentação disponível (plantas, diagramas unifilares, laudos, AVCB)</label><textarea data-k="ana.a6"></textarea>
+    <label>BMS/CCM Alqia cobre a unidade? Dados de automação disponíveis?</label><textarea data-k="ana.a7"></textarea>
+    <label>Restrições de acesso/horário para áreas técnicas</label><textarea data-k="ana.a8"></textarea>
+    <label>Outras informações</label><textarea data-k="ana.a9"></textarea>
+  </div>
+</section>
+
+<!-- ELÉTRICA -->
+<section class="sec" id="s-ele">
+  <details><summary>Guia — padrão Infralink (Elétrica)</summary>
+  Um registro por <b>quadro elétrico</b>. Sequência de 6 fotos por quadro: 1 vista externa · 2 identificação/QR · 3 vista interna · 4 detalhe técnico · 5 aterramento/segurança · 6 achado/NC. Marque os chips conforme fotografa com a câmera nativa.</details>
+  <div id="lista-ele"></div>
+  <button class="btn" onclick="addEle()">+ Adicionar quadro elétrico</button>
+</section>
+
+<!-- HVAC -->
+<section class="sec" id="s-hvac">
+  <details><summary>Guia — padrão Infralink (HVAC)</summary>
+  Um registro por <b>equipamento/sistema</b>. Roteiro típico por casa de máquinas: acesso → identificação → vista do ambiente → equipamento → placa técnica → filtros → hidráulica de água gelada → dutos → caixa de ventilação → quadro elétrico (externa + interna) → procedimentos operacionais → planta dos setores. Na CAG: chiller, bombas (condensação/primário/secundário), tubulações/isolamento, tratamento d'água, torres, tanque, sala de controle.</details>
+  <div id="lista-hvac"></div>
+  <button class="btn" onclick="addHvac()">+ Adicionar item HVAC</button>
+</section>
+
+<!-- ENVIAR -->
+<section class="sec" id="s-env">
+  <div class="card"><h3>Fechar e enviar</h3>
+    <div class="cnt" id="cnt2"></div>
+    <p class="muted">O pacote é um arquivo .html único com todo o levantamento + miniaturas + dados estruturados (JSON embutido). Envie ao Roberto por OneDrive, e-mail ou WhatsApp. Os originais das fotos vão pelo OneDrive.</p>
+    <button class="btn" onclick="enviar()">Gerar e compartilhar pacote</button>
+    <button class="btn sec2" onclick="baixarJSON()">Baixar somente JSON</button>
+    <button class="btn red" onclick="zerar()">Nova inspeção (apaga tudo)</button>
+  </div>
+</section>
+
+<nav class="tabs">
+  <button class="on" onclick="tab('geral',this)">Geral</button>
+  <button onclick="tab('anamnese',this)">Anamnese</button>
+  <button onclick="tab('ele',this)">Elétrica</button>
+  <button onclick="tab('hvac',this)">HVAC</button>
+  <button onclick="tab('env',this)">Enviar</button>
+</nav>
+
+<datalist id="dl-local"><option>Subestação</option><option>Sala do gerador</option><option>QGBT</option><option>Casa de bombas</option><option>Casa de máquinas</option><option>CAG</option><option>Cobertura</option><option>Subsolo</option><option>Docas</option><option>Praça de alimentação</option><option>Administração</option><option>Corredor técnico</option><option>Sala do nobreak</option></datalist>
+<datalist id="dl-ele"><option>Nível de sujidade inadequado.</option><option>Falta aterramento na porta.</option><option>Quadro elétrico sem QR code Infralink.</option><option>Identificação dos circuitos ausente ou desatualizada.</option><option>Prolongador manopla rotativa solto.</option><option>Fiação sem organização/amarração.</option><option>Tampa/espelho danificado ou ausente.</option><option>Aquecimento aparente em disjuntor/barramento.</option><option>Corrosão/oxidação em componentes.</option></datalist>
+<datalist id="dl-hvac"><option>Filtros de ar saturados.</option><option>Nível de sujidade inadequado.</option><option>Equipamento inoperante.</option><option>Isolamento térmico da tubulação danificado.</option><option>Acúmulo de corpos estranhos na casa de máquinas.</option><option>Procedimentos operacionais com logotipo da mantenedora anterior.</option><option>Vazamento de água gelada.</option><option>Ruído/vibração anormal (correias/rolamentos).</option><option>Em desacordo com o PMOC — passivo de autuação ANVISA.</option><option>Dreno obstruído/transbordando.</option></datalist>
+<datalist id="dl-cons"><option>Risco à segurança das pessoas.</option><option>Mau funcionamento e aspecto visual ruim.</option><option>Passivo de autuação (PMOC/ANVISA).</option><option>Perda de eficiência energética.</option><option>Risco de parada do sistema.</option><option>Redução da vida útil do equipamento.</option></datalist>
+
+<script>
+"use strict";
+const TIPOS_HVAC={"Central de Água Gelada":["Chiller (centrífugo/parafuso)","Bomba — circuito de condensação","Bomba — primário de água gelada","Bomba — secundário de água gelada","Tubulações de água gelada / isolamento","Unidade de tratamento d'água","Torre de resfriamento","Tanque de água gelada","Sala de controle / automação"],"Casas de máquinas / setores":["Fan & Coil","Filtros de ar","Instalações hidráulicas de água gelada","Ventilador / Exaustor","Caixa de ventilação (renovação)","Quadro elétrico / automação","Dutos (insuflação/retorno/renovação)","Splitão vertical","Condensadora split-system","Evaporadora split hi-wall","Giroval / difusores","Veneziana de retorno","Procedimentos operacionais (documentação)","Planta baixa dos setores climatizados"],"Administração / lojas":["Split hi-wall","Split piso/teto"],"Outros":["Outro (descrever)"]};
+const SEQ_ELE=["1 Externa","2 Identif./QR","3 Interna","4 Det. técnico","5 Aterram./seg.","6 Achado"];
+let S=null;
+const NOVO=()=>({v:"R01",geral:{},ana:{},ele:[],hvac:[]});
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const $=s=>document.querySelector(s);const esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- persistência ---------- */
+let tmr=null;
+function save(){clearTimeout(tmr);tmr=setTimeout(()=>{try{localStorage.setItem("cl044",JSON.stringify(S));$("#save").textContent="● salvo "+new Date().toLocaleTimeString("pt-BR");}catch(e){$("#save").textContent="⚠ erro ao salvar";}},400);}
+function load(){try{S=JSON.parse(localStorage.getItem("cl044"))||NOVO();}catch(e){S=NOVO();}}
+
+/* ---------- IndexedDB (miniaturas) ---------- */
+let db=null;
+const idb=new Promise(r=>{const q=indexedDB.open("cl044f",1);q.onupgradeneeded=e=>e.target.result.createObjectStore("f");q.onsuccess=e=>{db=e.target.result;r(db)};q.onerror=()=>r(null);});
+const fput=(k,v)=>idb.then(d=>d&&new Promise(r=>{const t=d.transaction("f","readwrite");t.objectStore("f").put(v,k);t.oncomplete=r;}));
+const fget=k=>idb.then(d=>d?new Promise(r=>{const q=d.transaction("f").objectStore("f").get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null);}):null);
+const fdel=k=>idb.then(d=>d&&new Promise(r=>{const t=d.transaction("f","readwrite");t.objectStore("f").delete(k);t.oncomplete=r;}));
+const fclear=()=>idb.then(d=>d&&new Promise(r=>{const t=d.transaction("f","readwrite");t.objectStore("f").clear();t.oncomplete=r;}));
+
+/* ---------- navegação ---------- */
+function tab(n,btn){document.querySelectorAll(".sec").forEach(s=>s.classList.remove("on"));$("#s-"+n).classList.add("on");document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("on"));btn.classList.add("on");window.scrollTo(0,0);}
+
+/* ---------- binds campos simples ---------- */
+function bindSimples(){document.querySelectorAll("[data-k]").forEach(el=>{const p=el.dataset.k.split(".");el.value=(S[p[0]]&&S[p[0]][p[1]])||"";el.oninput=()=>{S[p[0]]=S[p[0]]||{};S[p[0]][p[1]]=el.value;save();cont();};});}
+
+/* ---------- GUT ---------- */
+const gutCls=r=>r==null?"n":r<45?"v":r<100?"a":"r";
+function gutHtml(o){const R=(o.g&&o.u&&o.t)?o.g*o.u*o.t:null;const op=v=>[1,2,3,4,5].map(n=>`<option ${v==n?"selected":""}>${n}</option>`).join("");
+return `<label>G × U × T → resultado</label><div class="gut">
+<select data-g><option value="">G</option>${op(o.g)}</select>
+<select data-u><option value="">U</option>${op(o.u)}</select>
+<select data-t><option value="">T</option>${op(o.t)}</select>
+<div class="res ${gutCls(R)}">${R??"—"}</div></div>`;}
+
+/* ---------- fotos ---------- */
+function fotoHtml(o){return `<label>Miniaturas de referência (opcional — originais no OneDrive)</label>
+<input type="file" accept="image/*" multiple data-foto style="font-size:12px">
+<div class="fotos" data-fotos></div>
+<label>Nº das fotos na câmera nativa (ex.: IMG_4532–4540)</label><input type="text" data-f="refs" value="${esc(o.refs)}" placeholder="faixa de fotos correspondente">`;}
+function wireFotos(card,o){const inp=card.querySelector("[data-foto]");const box=card.querySelector("[data-fotos]");o.fotos=o.fotos||[];
+const paint=()=>{box.innerHTML="";o.fotos.forEach(k=>{const img=document.createElement("img");fget(k).then(d=>{if(d)img.src=d;});img.onclick=()=>{if(confirm("Remover miniatura?")){o.fotos=o.fotos.filter(x=>x!==k);fdel(k);save();paint();}};box.appendChild(img);});};
+paint();
+inp.onchange=async()=>{for(const f of inp.files){const d=await miniatura(f);const k=o.id+"_"+uid();await fput(k,d);o.fotos.push(k);}inp.value="";save();paint();};}
+function miniatura(file){return new Promise(res=>{const img=new Image();img.onload=()=>{const M=1280,r=Math.min(1,M/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=img.width*r;c.height=img.height*r;c.getContext("2d").drawImage(img,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.7));URL.revokeObjectURL(img.src);};img.src=URL.createObjectURL(file);});}
+
+/* ---------- condição/NC comum ---------- */
+function ncHtml(o,dl){return `<div class="row"><div><label>Condição</label>
+<select data-f="cond"><option value="">—</option><option ${o.cond=="OK"?"selected":""}>OK</option><option ${o.cond=="NC"?"selected":""}>NC</option><option ${o.cond=="NA"?"selected":""}>NA</option><option ${o.cond=="Não inspecionado"?"selected":""}>Não inspecionado</option></select></div>
+<div><label>Risco</label><select data-f="risco"><option value="">—</option><option ${o.risco=="Baixo"?"selected":""}>Baixo</option><option ${o.risco=="Médio"?"selected":""}>Médio</option><option ${o.risco=="Alto"?"selected":""}>Alto</option></select></div></div>
+<label>Descrição da não conformidade</label><input type="text" data-f="desc" list="${dl}" value="${esc(o.desc)}">
+<label>Consequência</label><input type="text" data-f="cons" list="dl-cons" value="${esc(o.cons)}">
+${gutHtml(o)}
+<label>Observações</label><textarea data-f="obs">${esc(o.obs)}</textarea>${fotoHtml(o)}`;}
+
+function wireCard(card,o,rerender){card.querySelectorAll("[data-f]").forEach(el=>{el.oninput=()=>{o[el.dataset.f]=el.value;save();cont();};});
+["g","u","t"].forEach(k=>{const el=card.querySelector(`[data-${k}]`);if(el)el.onchange=()=>{o[k]=+el.value||"";save();rerender();};});
+wireFotos(card,o);}
+
+/* ---------- ELÉTRICA ---------- */
+function addEle(){S.ele.push({id:uid(),local:"",pav:"",area:"",cod:"",seq:[0,0,0,0,0,0],cond:"",desc:"",cons:"",risco:"",g:"",u:"",t:"",refs:"",obs:"",fotos:[]});save();renderEle();}
+function renderEle(){const L=$("#lista-ele");L.innerHTML="";S.ele.forEach((o,i)=>{const c=document.createElement("div");c.className="item";
+c.innerHTML=`<div class="top"><b>Quadro ${i+1}</b><button class="del">remover</button></div>
+<label>Local</label><input type="text" data-f="local" list="dl-local" value="${esc(o.local)}">
+<div class="row"><div><label>Pavimento</label><input type="text" data-f="pav" value="${esc(o.pav)}"></div>
+<div><label>Área/ambiente</label><input type="text" data-f="area" value="${esc(o.area)}"></div></div>
+<label>Código / QR Infralink</label><input type="text" data-f="cod" value="${esc(o.cod)}">
+<label>Sequência de fotos (câmera nativa)</label><div class="chips">${SEQ_ELE.map((s,j)=>`<label class="chip"><input type="checkbox" data-seq="${j}" ${o.seq[j]?"checked":""}>${s}</label>`).join("")}</div>
+${ncHtml(o,"dl-ele")}`;
+c.querySelector(".del").onclick=()=>{if(confirm("Remover este quadro?")){o.fotos.forEach(fdel);S.ele.splice(i,1);save();renderEle();}};
+c.querySelectorAll("[data-seq]").forEach(ch=>{ch.onchange=()=>{o.seq[+ch.dataset.seq]=ch.checked?1:0;save();};});
+wireCard(c,o,renderEle);L.appendChild(c);});cont();}
+
+/* ---------- HVAC ---------- */
+function addHvac(){S.hvac.push({id:uid(),tipo:"",setor:"",cod:"",cond:"",desc:"",cons:"",risco:"",g:"",u:"",t:"",refs:"",obs:"",fotos:[]});save();renderHvac();}
+function renderHvac(){const L=$("#lista-hvac");L.innerHTML="";S.hvac.forEach((o,i)=>{const c=document.createElement("div");c.className="item";
+const opts=Object.entries(TIPOS_HVAC).map(([g,arr])=>`<optgroup label="${g}">`+arr.map(t=>`<option ${o.tipo==t?"selected":""}>${t}</option>`).join("")+`</optgroup>`).join("");
+c.innerHTML=`<div class="top"><b>Item ${i+1}</b><button class="del">remover</button></div>
+<label>Tipo de equipamento/sistema</label><select data-f="tipo"><option value="">—</option>${opts}</select>
+<div class="row"><div><label>Setor / casa de máquinas</label><input type="text" data-f="setor" list="dl-local" value="${esc(o.setor)}"></div>
+<div><label>TAG / código</label><input type="text" data-f="cod" value="${esc(o.cod)}"></div></div>
+${ncHtml(o,"dl-hvac")}`;
+c.querySelector(".del").onclick=()=>{if(confirm("Remover este item?")){o.fotos.forEach(fdel);S.hvac.splice(i,1);save();renderHvac();}};
+wireCard(c,o,renderHvac);L.appendChild(c);});cont();}
+
+/* ---------- contadores ---------- */
+function cont(){const all=[...S.ele,...S.hvac];const nc=all.filter(x=>x.cond=="NC");
+const cor=cl=>nc.filter(x=>x.g&&x.u&&x.t&&gutCls(x.g*x.u*x.t)==cl).length;
+const h=`<div><b>${S.ele.length}</b>Quadros elét.</div><div><b>${S.hvac.length}</b>Itens HVAC</div><div><b>${nc.length}</b>NCs</div><div style="color:var(--ok)"><b>${cor("v")}</b>Verde</div><div style="color:var(--warn)"><b>${cor("a")}</b>Amarelo</div><div style="color:var(--bad)"><b>${cor("r")}</b>Vermelho</div>`;
+$("#cnt").innerHTML=h;$("#cnt2").innerHTML=h;}
+
+/* ---------- pacote ---------- */
+async function pacoteHtml(){const g=S.geral,d=new Date();
+const linha=async(o,extra)=>{const R=(o.g&&o.u&&o.t)?o.g*o.u*o.t:null;const cls=gutCls(R);
+let th="";for(const k of (o.fotos||[])){const dt=await fget(k);if(dt)th+=`<img src="${dt}" style="width:110px;height:110px;object-fit:cover;border-radius:6px;margin:2px;border:1px solid #ccc">`;}
+return `<tr><td>${extra}</td><td>${esc(o.cond)}</td><td>${esc(o.desc)}<br><i style="color:#666">${esc(o.cons)}</i>${o.obs?`<br><small>${esc(o.obs)}</small>`:""}</td><td>${esc(o.risco)}</td><td style="text-align:center;font-weight:700;color:#fff;background:${cls=="v"?"#1e8e3e":cls=="a"?"#e8a200":cls=="r"?"#c5221f":"#9aa4ad"}">${R??"—"}</td><td>${esc(o.refs)}</td></tr>`+(th?`<tr><td colspan="6">${th}</td></tr>`:"");};
+let te="";for(let i=0;i<S.ele.length;i++){const o=S.ele[i];te+=await linha(o,`<b>Q${i+1}</b> ${esc(o.local)} · ${esc(o.pav)} · ${esc(o.area)}<br><small>Cód: ${esc(o.cod)} · Fotos seq.: ${o.seq.filter(Boolean).length}/6</small>`);}
+let th2="";for(let i=0;i<S.hvac.length;i++){const o=S.hvac[i];th2+=await linha(o,`<b>${i+1}</b> ${esc(o.tipo)}<br><small>${esc(o.setor)} · TAG: ${esc(o.cod)}</small>`);}
+const ana=Object.entries({a1:"Idade/intervenções",a2:"Mantenedora",a3:"PMOC/ART",a4:"Contratos",a5:"Ocorrências",a6:"Documentação",a7:"BMS/CCM",a8:"Acesso",a9:"Outras"}).map(([k,t])=>S.ana[k]?`<tr><td><b>${t}</b></td><td>${esc(S.ana[k])}</td></tr>`:"").join("");
+const tbl='border="0" cellspacing="0" cellpadding="6" style="border-collapse:collapse;width:100%;font-size:13px" ';
+const css="td{border:1px solid #ddd;vertical-align:top}th{background:#1D3563;color:#fff;border:1px solid #1D3563;padding:6px}";
+return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Levantamento 044 ${esc(g.site)} ${esc(g.data)}</title><style>body{font-family:Arial;color:#2C2C2C;margin:16px}h1{color:#1D3563;font-size:20px}h2{color:#00A0AC;font-size:16px;border-bottom:2px solid #00A0AC;padding-bottom:3px}${css}</style></head><body>
+<h1>COSTARD ENGENHARIA — Levantamento de Campo (projeto 044)</h1>
+<p><b>Unidade:</b> ${esc(g.site)} — ${esc(g.unidade)} · <b>Data:</b> ${esc(g.data)} ${esc(g.hIni)}–${esc(g.hFim)} · <b>Inspetor:</b> ${esc(g.inspetor)} · <b>Acompanhante:</b> ${esc(g.acomp)}</p>
+${g.obs?`<p><b>Observações gerais:</b> ${esc(g.obs)}</p>`:""}
+<h2>Anamnese</h2><table ${tbl}>${ana||"<tr><td>—</td></tr>"}</table>
+<h2>Elétrica — quadros (${S.ele.length})</h2><table ${tbl}><tr><th>Quadro/local</th><th>Cond.</th><th>Descrição</th><th>Risco</th><th>G×U×T</th><th>Fotos câmera</th></tr>${te||""}</table>
+<h2>HVAC — itens (${S.hvac.length})</h2><table ${tbl}><tr><th>Item/tipo</th><th>Cond.</th><th>Descrição</th><th>Risco</th><th>G×U×T</th><th>Fotos câmera</th></tr>${th2||""}</table>
+<p style="font-size:11px;color:#777">Gerado em ${d.toLocaleString("pt-BR")} pelo Checklist de Campo Costard R01. Originais de fotos/áudio: OneDrive da unidade. Dados estruturados embutidos abaixo (JSON) para processamento.</p>
+<script type="application/json" id="dados-json">${JSON.stringify(S).replace(/</g,"\\u003c")}<\/script></body></html>`;}
+function nomeBase(){const g=S.geral;return `Levantamento_044_${g.site||"SITE"}_${g.data||new Date().toISOString().slice(0,10)}`;}
+async function enviar(){const html=await pacoteHtml();const f=new File([html],nomeBase()+".html",{type:"text/html"});
+if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:nomeBase()});return;}catch(e){if(e.name==="AbortError")return;}}
+baixar(html,nomeBase()+".html","text/html");alert("Compartilhamento direto indisponível — o arquivo foi baixado. Envie-o pelo OneDrive, e-mail ou WhatsApp.");}
+function baixarJSON(){baixar(JSON.stringify(S,null,1),nomeBase()+".json","application/json");}
+function baixar(txt,nome,tipo){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:tipo}));a.download=nome;document.body.appendChild(a);a.click();a.remove();}
+function zerar(){if(confirm("Apagar TODO o levantamento deste aparelho?")&&confirm("Tem certeza? Esta ação não pode ser desfeita.")){localStorage.removeItem("cl044");fclear();location.reload();}}
+
+/* ---------- init ---------- */
+load();bindSimples();renderEle();renderHvac();cont();
+if(!S.geral.data){S.geral.data=new Date().toISOString().slice(0,10);save();bindSimples();}
+</script>
+</body>
+</html>
