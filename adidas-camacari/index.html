@@ -1,0 +1,1204 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1d3563">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Inspeção HVAC — Camaçari | Costard</title>
+  <style>
+    :root {
+      --navy:#1d3563;
+      --navy-2:#122442;
+      --teal:#00a0ac;
+      --teal-dark:#08727a;
+      --ink:#24313d;
+      --muted:#667480;
+      --line:#d7e0e6;
+      --surface:#ffffff;
+      --bg:#f3f6f8;
+      --soft:#edf7f8;
+      --warn:#9a6400;
+      --warn-bg:#fff6d9;
+      --danger:#a32828;
+      --danger-bg:#fff0f0;
+      --ok:#237a43;
+      --ok-bg:#eaf7ef;
+      --shadow:0 2px 10px rgba(18,36,66,.08);
+      --radius:14px;
+    }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html { scroll-behavior:smooth; }
+    body {
+      margin:0;
+      background:var(--bg);
+      color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      font-size:16px;
+      line-height:1.42;
+      padding-bottom:calc(78px + env(safe-area-inset-bottom));
+    }
+    button,input,select,textarea { font:inherit; }
+    button,input,select,textarea,a { touch-action:manipulation; }
+    button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible {
+      outline:3px solid rgba(0,160,172,.38);
+      outline-offset:2px;
+    }
+    .app-header {
+      position:sticky;
+      top:0;
+      z-index:30;
+      color:#fff;
+      background:linear-gradient(135deg,var(--navy-2),var(--navy));
+      padding:max(11px,env(safe-area-inset-top)) 16px 11px;
+      box-shadow:0 2px 12px rgba(0,0,0,.18);
+    }
+    .header-row { max-width:1180px; margin:auto; display:flex; gap:12px; align-items:center; justify-content:space-between; }
+    .brand { min-width:0; }
+    .brand strong { display:block; font-size:16px; letter-spacing:.02em; }
+    .brand span { display:block; margin-top:2px; font-size:12px; opacity:.86; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    #save-status { flex:0 0 auto; font-size:12px; color:#b9f2f4; text-align:right; }
+    .offline-mark { display:block; opacity:.8; font-size:10px; }
+    main { max-width:1180px; margin:0 auto; padding:12px; }
+    .banner {
+      border:1px solid #cbdfe2;
+      border-left:6px solid var(--teal);
+      border-radius:12px;
+      background:#f8ffff;
+      padding:12px 14px;
+      margin-bottom:12px;
+      font-size:14px;
+    }
+    .banner strong { color:var(--navy); }
+    .banner.warn { border-color:#ead28d; border-left-color:#d28a00; background:var(--warn-bg); }
+    .banner.danger { border-color:#efc5c5; border-left-color:var(--danger); background:var(--danger-bg); }
+    .banner.ok { border-color:#bcdcc8; border-left-color:var(--ok); background:var(--ok-bg); }
+    .local-only { display:flex; gap:9px; align-items:flex-start; }
+    .local-dot { width:11px; height:11px; margin-top:5px; border-radius:50%; background:var(--ok); box-shadow:0 0 0 4px rgba(35,122,67,.13); flex:0 0 auto; }
+    .section { display:none; }
+    .section.active { display:block; }
+    .section-heading { margin:14px 2px 10px; }
+    .section-heading h1 { margin:0; color:var(--navy); font-size:22px; line-height:1.2; }
+    .section-heading p { margin:5px 0 0; color:var(--muted); font-size:14px; }
+    .card {
+      background:var(--surface);
+      border:1px solid #e2e8ec;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:15px;
+      margin-bottom:12px;
+    }
+    .card h2,.card h3 { color:var(--navy); margin:0 0 9px; line-height:1.25; }
+    .card h2 { font-size:18px; }
+    .card h3 { font-size:16px; }
+    .card p { margin:7px 0; }
+    .card-id { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:10px; }
+    .id-code { color:var(--navy); font-size:18px; font-weight:800; letter-spacing:.03em; }
+    .badge { display:inline-flex; align-items:center; min-height:28px; padding:4px 9px; border-radius:999px; background:var(--soft); color:var(--teal-dark); font-size:12px; font-weight:700; }
+    .badge.reference { background:var(--warn-bg); color:#805300; }
+    .badge.muted { background:#eef1f3; color:#5e6871; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 12px; }
+    .grid.three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .span-all { grid-column:1/-1; }
+    label,.label { display:block; color:#354653; font-size:13px; font-weight:700; margin:10px 0 4px; }
+    .help { display:block; color:var(--muted); font-size:12px; font-weight:400; margin-top:3px; }
+    input[type=text],input[type=date],input[type=time],input[type=number],select,textarea {
+      width:100%;
+      min-height:46px;
+      border:1px solid #bdc9d1;
+      border-radius:10px;
+      background:#fff;
+      color:var(--ink);
+      padding:10px 11px;
+    }
+    textarea { min-height:82px; resize:vertical; }
+    input::placeholder,textarea::placeholder { color:#87939c; opacity:1; }
+    fieldset { border:1px solid var(--line); border-radius:12px; padding:10px 12px 12px; margin:12px 0 0; }
+    legend { color:var(--navy); font-size:14px; font-weight:800; padding:0 6px; }
+    .check-row {
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      min-height:48px;
+      padding:9px 5px;
+      border-bottom:1px solid #edf1f3;
+      font-size:14px;
+    }
+    .check-row:last-child { border-bottom:0; }
+    .check-row input[type=checkbox] { width:24px; height:24px; margin:1px 0 0; flex:0 0 auto; accent-color:var(--teal); }
+    .check-row label { margin:0; font-size:14px; font-weight:600; }
+    .check-row small { display:block; color:var(--muted); font-size:12px; font-weight:400; margin-top:2px; }
+    details { border:1px solid var(--line); border-radius:12px; background:#fbfcfd; margin:10px 0; }
+    summary { min-height:48px; padding:13px; color:var(--navy); cursor:pointer; font-weight:800; }
+    details > div { padding:0 13px 13px; }
+    .principles { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin:10px 0; }
+    .principle { border-radius:10px; padding:10px; background:#f3f7f9; font-size:12px; }
+    .principle b { display:block; color:var(--navy); font-size:14px; margin-bottom:3px; }
+    .visual-table { width:100%; border-collapse:separate; border-spacing:0 8px; }
+    .visual-table th { text-align:left; color:var(--muted); font-size:12px; padding:0 6px; }
+    .visual-table td { background:#f7f9fa; padding:7px 6px; vertical-align:middle; }
+    .visual-table td:first-child { border-radius:9px 0 0 9px; font-size:13px; font-weight:700; width:34%; }
+    .visual-table td:last-child { border-radius:0 9px 9px 0; }
+    .visual-table select { min-height:44px; font-size:13px; }
+    .btn-row { display:flex; flex-wrap:wrap; gap:9px; margin-top:11px; }
+    .btn {
+      display:inline-flex;
+      min-height:48px;
+      align-items:center;
+      justify-content:center;
+      border:0;
+      border-radius:11px;
+      padding:11px 15px;
+      background:var(--teal);
+      color:#fff;
+      font-weight:800;
+      text-decoration:none;
+      cursor:pointer;
+    }
+    .btn.secondary { background:var(--navy); }
+    .btn.ghost { background:#e9eef1; color:var(--ink); }
+    .btn.small { min-height:44px; padding:8px 12px; font-size:13px; }
+    .btn:disabled { background:#b7c1c7; color:#fff; cursor:not-allowed; }
+    .photo-tools { border-top:1px solid var(--line); margin-top:14px; padding-top:12px; }
+    .photo-toolbar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .photo-input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+    .thumbs { display:grid; grid-template-columns:repeat(auto-fill,minmax(106px,1fr)); gap:8px; margin-top:10px; }
+    .thumb { min-width:0; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:#f7f9fa; }
+    .thumb img { display:block; width:100%; aspect-ratio:4/3; object-fit:cover; background:#e9eef1; }
+    .thumb .no-thumb { display:flex; align-items:center; justify-content:center; width:100%; aspect-ratio:4/3; color:var(--muted); padding:8px; text-align:center; font-size:12px; }
+    .thumb input { border:0; border-top:1px solid var(--line); border-radius:0; min-height:44px; font-size:12px; padding:7px; }
+    .photo-count { display:inline-flex; min-height:44px; align-items:center; padding:7px 10px; border-radius:10px; background:#edf2f4; color:var(--navy); font-weight:800; font-size:13px; }
+    .counter-control { display:inline-flex; align-items:center; gap:6px; }
+    .counter-control button { width:44px; height:44px; border:0; border-radius:10px; background:#e7ecef; color:var(--navy); font-size:22px; font-weight:800; }
+    .counter-control output { min-width:36px; text-align:center; font-weight:800; }
+    .empty { border:1px dashed #b9c5cc; border-radius:12px; padding:18px; text-align:center; color:var(--muted); background:rgba(255,255,255,.6); margin-bottom:12px; }
+    .reconcile { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; margin:10px 0; }
+    .metric { background:#f1f5f7; border-radius:11px; padding:10px; text-align:center; font-size:12px; color:var(--muted); }
+    .metric b { display:block; color:var(--navy); font-size:20px; line-height:1.1; }
+    .lacunas { margin:8px 0 0; padding-left:22px; }
+    .lacunas li { margin:6px 0; }
+    .status-line { min-height:22px; margin-top:8px; color:var(--muted); font-size:13px; }
+    .bottom-tabs {
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:40;
+      display:grid;
+      grid-template-columns:repeat(6,minmax(0,1fr));
+      padding:0 4px env(safe-area-inset-bottom);
+      background:rgba(255,255,255,.98);
+      border-top:1px solid #cfd8de;
+      box-shadow:0 -3px 12px rgba(18,36,66,.08);
+    }
+    .bottom-tabs button {
+      min-height:62px;
+      border:0;
+      border-top:4px solid transparent;
+      background:transparent;
+      color:#65727c;
+      padding:7px 2px 6px;
+      font-size:11px;
+      font-weight:700;
+    }
+    .bottom-tabs button.active { color:var(--teal-dark); border-top-color:var(--teal); background:#f5fcfc; }
+    .bottom-tabs button[aria-disabled=true] { color:#9ba5ac; }
+    .sr-only { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important; }
+    @media (max-width:760px) {
+      main { padding:10px; }
+      .grid,.grid.three { grid-template-columns:1fr; gap:0; }
+      .principles { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .reconcile { grid-template-columns:repeat(3,minmax(0,1fr)); }
+      .bottom-tabs button { font-size:10px; }
+      .visual-table td:first-child { width:40%; }
+    }
+    @media (min-width:900px) and (orientation:landscape) {
+      .equipment-layout { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:14px; }
+      .equipment-layout > .span-all { grid-column:1/-1; }
+    }
+    @media print {
+      body { background:#fff; padding:0; font-size:11pt; }
+      .app-header,.bottom-tabs,.no-print,.photo-toolbar,.btn-row { display:none!important; }
+      main { max-width:none; padding:0; }
+      .section { display:block!important; page-break-before:always; }
+      .section:first-of-type { page-break-before:auto; }
+      .card { box-shadow:none; border:1px solid #bbb; break-inside:avoid; }
+      input,select,textarea { border:1px solid #bbb; }
+      details { break-inside:avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-row">
+      <div class="brand">
+        <strong>COSTARD — Inspeção HVAC</strong>
+        <span>Projeto 052 · Loja Camaçari · roteiro não invasivo</span>
+      </div>
+      <div id="save-status" role="status" aria-live="polite">Preparando…<span class="offline-mark">dados locais</span></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="banner local-only no-print">
+      <span class="local-dot" aria-hidden="true"></span>
+      <div><strong>Privacidade local.</strong> Este checklist não envia dados, fotos ou localização. O salvamento automático usa somente este navegador; exportação e compartilhamento acontecem apenas quando você gerar um arquivo.</div>
+    </div>
+    <div class="banner warn">
+      <strong>Modo não invasivo:</strong> observar, entrevistar, fotografar e operar apenas comandos normais já existentes. Não usar manifold, não intervir no circuito frigorífico, não fazer bypass, não acionar contator manualmente e não abrir compartimento energizado. Abrir gabinete ou medir é exceção documentada — nunca o padrão.
+    </div>
+    <div class="banner warn">
+      <strong>Sem termohigrômetro nesta visita:</strong> não haverá medição independente de temperatura ou umidade relativa. Valores mostrados por termostato ou BMS são apenas indicações do equipamento: fotografe a tela junto com a fonte/equipamento e registre o horário. Sensações devem ser descritas somente de forma comparativa. Não calcular ou alegar ΔT, conforto quantitativo, capacidade ou desempenho.
+    </div>
+
+    <section class="section active" id="tab-inicio" data-section="inicio">
+      <div class="section-heading">
+        <h1>Início e segurança</h1>
+        <p>Identifique a visita, alinhe o escopo e conclua o gate antes da observação técnica.</p>
+      </div>
+
+      <article class="card">
+        <h2>Dados da visita</h2>
+        <div class="grid three">
+          <div><label for="visit-inspector">Inspetor</label><input id="visit-inspector" type="text" data-path="visit.inspector" autocomplete="name" placeholder="Nome"></div>
+          <div><label for="visit-date">Data</label><input id="visit-date" type="date" data-path="visit.date"></div>
+          <div><label for="visit-start">Início</label><input id="visit-start" type="time" data-path="visit.start"></div>
+          <div><label for="visit-end">Término</label><input id="visit-end" type="time" data-path="visit.end"></div>
+          <div><label for="visit-store">Unidade</label><input id="visit-store" type="text" data-path="visit.store" readonly></div>
+          <div><label for="visit-companion">Acompanhante local <span class="help">nome e função; contato não é necessário</span></label><input id="visit-companion" type="text" data-path="visit.companion" placeholder="Nome / função"></div>
+          <div class="span-all"><label for="visit-purpose">Objetivo confirmado com o local</label><textarea id="visit-purpose" data-path="visit.purpose" placeholder="Ex.: coleta visual e documental para diagnóstico posterior do especialista"></textarea></div>
+          <div class="span-all"><label for="visit-context">Condições de chegada</label><textarea id="visit-context" data-path="visit.arrivalContext" placeholder="Loja aberta/fechada, ocupação, sistemas ligados, chuva/sol, restrições de acesso"></textarea></div>
+          <div class="span-all"><label for="visit-instruments">Instrumentos disponíveis e limitações da visita</label><textarea id="visit-instruments" data-path="visit.instrumentLimitations" placeholder="Registre instrumentos ausentes, dados não medidos e limites de interpretação"></textarea></div>
+        </div>
+      </article>
+
+      <article class="card" id="safety-card">
+        <h2>Gate de segurança</h2>
+        <p>Marque somente após confirmar. Sem os quatro itens, as etapas técnicas ficam bloqueadas; a entrevista e o fechamento continuam disponíveis.</p>
+        <fieldset>
+          <legend>Condições mínimas</legend>
+          <div class="check-row"><input id="safe-auth" type="checkbox" data-path="safety.localAuthorization"><label for="safe-auth">Autorização local e limites de acesso foram confirmados.<small>Se houver área restrita, não entre sem acompanhamento/autorização.</small></label></div>
+          <div class="check-row"><input id="safe-normal" type="checkbox" data-path="safety.normalCommandsOnly"><label for="safe-normal">A visita seguirá somente comandos normais existentes.<small>Sem bypass, ponte, reset repetitivo, acionamento manual de contator ou alteração de proteção/setpoint fora da rotina autorizada.</small></label></div>
+          <div class="check-row"><input id="safe-live" type="checkbox" data-path="safety.noLiveExposure"><label for="safe-live">Não haverá exposição a partes vivas nem abertura de compartimento energizado.<small>Se a inspeção exigir isso, parar e registrar a lacuna para profissional autorizado.</small></label></div>
+          <div class="check-row"><input id="safe-stop" type="checkbox" data-path="safety.stopConditions"><label for="safe-stop">Condições de parada estão entendidas.<small>Parar diante de partes expostas, arco/odor de queimado, fumaça, instabilidade, acesso inseguro, condensado próximo à elétrica ou qualquer dúvida de segurança.</small></label></div>
+        </fieldset>
+        <div id="safety-result" class="banner warn" role="status" aria-live="polite">Gate pendente.</div>
+        <label for="unsafe-note">Condição insegura, impedimento ou decisão de encerrar</label>
+        <textarea id="unsafe-note" data-path="safety.stopNote" placeholder="Registre o local, a condição e a decisão. Não investigue além do seguro."></textarea>
+      </article>
+
+      <article class="card">
+        <h2>Limites do que esta visita pode concluir</h2>
+        <div class="banner danger">
+          Esta visita, por si só, <strong>não prova vazamento ativo, carga de refrigerante, desempenho frigorífico ou necessidade de condenação</strong>. Também não confirma causa, reincidência, material aplicado ou qualidade de serviço anterior sem identidade física e evidência compatível.
+        </div>
+        <div class="principles">
+          <div class="principle"><b>Fato</b>Observado diretamente, com local, momento e evidência.</div>
+          <div class="principle"><b>Relato</b>Informação atribuída a quem informou; não vira fato observado.</div>
+          <div class="principle"><b>Interpretação</b>Leitura preliminar, separada da descrição objetiva.</div>
+          <div class="principle"><b>Hipótese</b>Possibilidade a validar pelo especialista ou por ensaio futuro.</div>
+        </div>
+      </article>
+    </section>
+
+    <section class="section" id="tab-entrevista" data-section="entrevista">
+      <div class="section-heading">
+        <h1>Entrevista</h1>
+        <p>Reconstrua cronologia, sintomas, intervenções e documentos sem transformar relato em diagnóstico.</p>
+      </div>
+      <article class="card">
+        <h2>Operação e sintomas</h2>
+        <div class="grid">
+          <div><label for="int-source">Fonte do relato <span class="help">nome e função</span></label><input id="int-source" type="text" data-path="interview.source" placeholder="Quem acompanha a operação?"></div>
+          <div><label for="int-schedule">Horário e rotina de operação</label><input id="int-schedule" type="text" data-path="interview.schedule" placeholder="Dias, horários, partida e desligamento"></div>
+          <div class="span-all"><label for="int-complaint">Queixa atual nas palavras do informante</label><textarea id="int-complaint" data-path="interview.currentComplaint" placeholder="Quando começou, frequência, áreas afetadas, impacto e condições em que ocorre"></textarea></div>
+          <div><label for="int-comfort">Conforto térmico e distribuição</label><textarea id="int-comfort" data-path="interview.comfort" placeholder="Quente/frio, pontos específicos, horários, variação com ocupação"></textarea></div>
+          <div><label for="int-signals">Sinais associados relatados</label><textarea id="int-signals" data-path="interview.associatedSignals" placeholder="Ruído, vibração, odor, gotejamento, alarmes, paradas, gelo"></textarea></div>
+          <div><label for="int-command">Comandos e setpoints usuais</label><textarea id="int-command" data-path="interview.normalControls" placeholder="Quem opera, ajuste habitual, alterações recentes"></textarea></div>
+          <div><label for="int-pattern">Padrão e cronologia</label><textarea id="int-pattern" data-path="interview.timeline" placeholder="Contínuo/intermitente; datas aproximadas; antes/depois de quê"></textarea></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Manutenção, falhas e intervenções</h2>
+        <div class="grid">
+          <div><label for="int-maint">Mantenedora e periodicidade</label><textarea id="int-maint" data-path="interview.maintenance" placeholder="Quem atende, última preventiva, pendências conhecidas"></textarea></div>
+          <div><label for="int-fail">Falhas e alarmes recentes</label><textarea id="int-fail" data-path="interview.failures" placeholder="Código/mensagem, data, resposta dada e recorrência relatada"></textarea></div>
+          <div class="span-all"><label for="int-prior">Intervenção anterior relevante — relato/documento</label><textarea id="int-prior" data-path="interview.priorIntervention" placeholder="Data, equipamento, componente, sintoma, serviço e fonte. Não atribua material ou qualidade sem documento."></textarea></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Gate de rastreabilidade da intervenção anterior</h2>
+        <div class="banner warn">
+          Confirmar fisicamente <strong>qual serpentina recebeu a intervenção anterior</strong> e se é a mesma hoje apontada. Sem identidade inequívoca, não tratar como reincidência nem atribuir material, método ou serviço.
+        </div>
+        <div class="grid">
+          <div><label for="trace-prior">Como a serpentina anterior foi identificada?</label><textarea id="trace-prior" data-path="trace.priorIdentity" placeholder="TAG, modelo/série, posição, fotos, OS, croqui, marcas físicas"></textarea></div>
+          <div><label for="trace-current">Como a serpentina atual foi identificada?</label><textarea id="trace-current" data-path="trace.currentIdentity" placeholder="TAG, modelo/série, posição exata e foto de contexto + detalhe"></textarea></div>
+          <div><label for="trace-match">Correspondência física</label><select id="trace-match" data-path="trace.match"><option value="">Não avaliada</option><option value="yes">Confirmada — mesma serpentina</option><option value="no">Não é a mesma</option><option value="indeterminate">Indeterminada / evidência insuficiente</option></select></div>
+          <div><label for="trace-source">Fonte documental usada</label><input id="trace-source" type="text" data-path="trace.sourceReference" placeholder="Documento/data/página ou 'não disponível'"></div>
+          <div class="span-all"><label for="trace-basis">Base objetiva da correspondência</label><textarea id="trace-basis" data-path="trace.matchBasis" placeholder="Descreva os elementos comparados; evite concluir apenas por proximidade ou relato"></textarea></div>
+        </div>
+        <div id="trace-result" class="banner warn" role="status" aria-live="polite">Rastreabilidade ainda não estabelecida.</div>
+      </article>
+
+      <article class="card">
+        <h2>Documentos disponíveis no local</h2>
+        <div class="grid">
+          <div><label for="int-docs">Vistos ou recebidos</label><textarea id="int-docs" data-path="interview.documentsSeen" placeholder="OS, PMOC, relatório, fotos anteriores, manuais, planta, histórico de alarmes"></textarea></div>
+          <div><label for="int-promised">Solicitados / prometidos</label><textarea id="int-promised" data-path="interview.documentsPromised" placeholder="Documento, responsável e previsão"></textarea></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="section" id="tab-ambientes" data-section="ambientes">
+      <div class="section-heading">
+        <h1>Ambientes</h1>
+        <p>Registre cada zona percebida/atendida antes de relacionar equipamentos e achados.</p>
+      </div>
+      <div id="zone-list"></div>
+      <div class="btn-row no-print"><button class="btn" type="button" data-action="add-zone">+ Adicionar ambiente</button></div>
+    </section>
+
+    <section class="section" id="tab-equipamentos" data-section="equipamentos">
+      <div class="section-heading">
+        <h1>Equipamentos</h1>
+        <p>As referências pré-campo não são inventário confirmado. Valide placa, localização e associação física.</p>
+      </div>
+      <div class="banner warn">
+        Referências a confirmar: sistema Hitachi indicado como 30 TR, duas condensadoras possivelmente associadas; sistema Carrier indicado como 25 TR; e demais ativos encontrados. Nada disso deve ser tratado como fato até a conferência em campo.
+      </div>
+      <div id="equipment-list"></div>
+      <div class="btn-row no-print"><button class="btn" type="button" data-action="add-equipment">+ Adicionar equipamento</button></div>
+    </section>
+
+    <section class="section" id="tab-achados" data-section="achados">
+      <div class="section-heading">
+        <h1>Achados</h1>
+        <p>Um registro por condição. Separe evidência, relato e raciocínio; deixe o diagnóstico central para o especialista.</p>
+      </div>
+      <div id="finding-list"></div>
+      <div class="btn-row no-print"><button class="btn" type="button" data-action="add-finding">+ Adicionar achado</button></div>
+    </section>
+
+    <section class="section" id="tab-fechar" data-section="fechar">
+      <div class="section-heading">
+        <h1>Fechar a visita</h1>
+        <p>Reconcilie ativos, fotos, lacunas e perguntas antes de gerar o pacote para análise.</p>
+      </div>
+
+      <article class="card">
+        <h2>Reconciliação automática</h2>
+        <div id="metrics" class="reconcile"></div>
+        <h3>Lacunas detectadas</h3>
+        <ul id="gap-list" class="lacunas"></ul>
+      </article>
+
+      <article class="card">
+        <h2>Documentos e evidências externas</h2>
+        <div class="grid">
+          <div><label for="close-doc-received">Recebidos / fotografados</label><textarea id="close-doc-received" data-path="close.documentsReceived" placeholder="Nome, data/versão e origem"></textarea></div>
+          <div><label for="close-doc-pending">Pendentes</label><textarea id="close-doc-pending" data-path="close.documentsPending" placeholder="OS anterior, PMOC, relatório de manutenção, fotos anteriores, alarmes, outros"></textarea></div>
+          <div class="span-all"><label for="close-originals">Onde ficaram os originais de fotos/documentos?</label><textarea id="close-originals" data-path="close.originalsLocation" placeholder="Ex.: Fotos do iPad, pasta a enviar; não inclua credenciais ou links privados desnecessários"></textarea></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Perguntas para Raul / especialista</h2>
+        <div class="grid">
+          <div><label for="q1">1. Identidade e rastreabilidade</label><textarea id="q1" data-path="close.questions.identity" placeholder="A evidência permite afirmar que é a mesma serpentina? O que ainda falta?"></textarea></div>
+          <div><label for="q2">2. Leitura dos padrões visuais</label><textarea id="q2" data-path="close.questions.visual" placeholder="Quais padrões merecem diagnóstico diferencial e por quê?"></textarea></div>
+          <div><label for="q3">3. Ensaios posteriores necessários</label><textarea id="q3" data-path="close.questions.tests" placeholder="Que medições/testes específicos seriam necessários em nova etapa e sob quais condições?"></textarea></div>
+          <div><label for="q4">4. Conteúdo central do relatório</label><textarea id="q4" data-path="close.questions.report" placeholder="Conclusões sustentáveis, limitações, criticidade e recomendações"></textarea></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Declarações de fechamento</h2>
+        <fieldset>
+          <legend>Conferência antes de exportar</legend>
+          <div class="check-row"><input id="close-reconciled" type="checkbox" data-path="close.reconciled"><label for="close-reconciled">Reconciliei ambientes, equipamentos, achados e faixas de fotos.<small>Itens não inspecionados permanecem explícitos; não foram apagados.</small></label></div>
+          <div class="check-row"><input id="close-facts" type="checkbox" data-path="close.separatedEvidence"><label for="close-facts">Mantive Fato, Relato, Interpretação e Hipótese separados.</label></div>
+          <div class="check-row"><input id="close-limit" type="checkbox" data-path="close.acceptedLimit"><label for="close-limit">O pacote declara a ausência de medição independente de temperatura/UR e que a visita não determina ΔT, conforto quantitativo, vazamento ativo, carga, capacidade, desempenho frigorífico ou condenação.</label></div>
+          <div class="check-row"><input id="close-trace" type="checkbox" data-path="close.traceabilityHandled"><label for="close-trace">A rastreabilidade foi demonstrada ou a insuficiência de identidade ficou expressa, sem alegar reincidência/material/serviço.</label></div>
+        </fieldset>
+        <label for="close-summary">Resumo de passagem ao especialista</label>
+        <textarea id="close-summary" data-path="close.handoffSummary" placeholder="O que foi observado, quais relatos importam, lacunas e decisões que o especialista precisa tomar"></textarea>
+        <div class="btn-row no-print">
+          <button class="btn" type="button" data-action="export-html">Gerar pacote HTML</button>
+          <button class="btn secondary" type="button" data-action="export-json">Baixar JSON</button>
+          <button class="btn ghost" type="button" data-action="print">Imprimir / salvar PDF</button>
+        </div>
+        <div id="export-status" class="status-line" role="status" aria-live="polite"></div>
+      </article>
+    </section>
+  </main>
+
+  <nav class="bottom-tabs no-print" aria-label="Etapas do roteiro">
+    <button class="active" type="button" data-tab="inicio" aria-current="page">Início</button>
+    <button type="button" data-tab="entrevista">Entrevista</button>
+    <button type="button" data-tab="ambientes" aria-disabled="true">Ambientes</button>
+    <button type="button" data-tab="equipamentos" aria-disabled="true">Equipamentos</button>
+    <button type="button" data-tab="achados" aria-disabled="true">Achados</button>
+    <button type="button" data-tab="fechar">Fechar</button>
+  </nav>
+
+  <template id="photo-widget-template">
+    <div class="photo-tools">
+      <div class="label">Registro fotográfico</div>
+      <div class="photo-toolbar">
+        <label class="btn small">Abrir câmera
+          <input class="photo-input" type="file" accept="image/*" capture="environment" data-photo-input>
+        </label>
+        <label class="btn ghost small">Escolher da Fototeca
+          <input class="photo-input" type="file" accept="image/*" multiple data-photo-input>
+        </label>
+        <span class="photo-count" data-photo-range>sem fotos</span>
+      </div>
+      <div class="check-row">
+        <input type="checkbox" data-keep-thumbnails>
+        <label>Guardar miniaturas neste checklist<small>Opcional. Os arquivos originais não são enviados nem substituídos; confirme que ficaram preservados no iPad/câmera.</small></label>
+      </div>
+      <div class="photo-toolbar">
+        <span class="help">Fotos feitas fora do checklist, sem miniatura:</span>
+        <span class="counter-control"><button type="button" data-extra-photo="-1" aria-label="Diminuir contagem">−</button><output data-extra-count>0</output><button type="button" data-extra-photo="1" aria-label="Aumentar contagem">+</button></span>
+      </div>
+      <div class="thumbs" data-thumbs></div>
+    </div>
+  </template>
+
+  <script>
+  "use strict";
+
+  const STORAGE_KEY = "costard.adidas052.camacari.v1";
+  const PHOTO_DB = "costard_adidas052_camacari_photos_v1";
+  const SCHEMA = "CAM-R01";
+  const TECH_TABS = new Set(["ambientes","equipamentos","achados"]);
+  const SAFETY_KEYS = ["localAuthorization","normalCommandsOnly","noLiveExposure","stopConditions"];
+  const VISUAL_ITEMS = [
+    ["coil","Serpentinas","Faces acessíveis, sujidade, deformação, corrosão, gelo/umidade aparente; sem afirmar vazamento"],
+    ["tubes","Tubos","Traçado visível, oxidação, atrito, apoio, isolamento e marcas externas"],
+    ["fins","Aletas","Amassamento, obstrução, corrosão, sujeira e uniformidade aparente"],
+    ["brazing","Brasagens / uniões","Aspecto visual, vestígios, proteção e posição; sem atribuir material ou executor"],
+    ["cabinet","Gabinete","Integridade, corrosão, fixação, vedação e acesso"],
+    ["drains","Drenos / bandeja","Caimento aparente, água parada, transbordo, obstrução e descarga"],
+    ["filters","Filtros","Presença, encaixe, saturação aparente e acesso"],
+    ["airflow","Fluxo de ar","Obstruções, retorno/insuflação e percepção comparativa; sem quantificar vazão"],
+    ["controls","Controles","Display, alarmes, setpoint indicado e resposta a comando normal autorizado"],
+    ["exposure","Exposição / entorno","Sol, intempérie, maresia/poluição, fontes de calor, recirculação e obstáculos"]
+  ];
+  const VISUAL_OPTIONS = [
+    ["","Não avaliado"],
+    ["ok","Sem alteração visual relevante"],
+    ["attention","Alteração aparente — registrar achado"],
+    ["not_seen","Não observado / acesso impedido"],
+    ["na","Não aplicável"]
+  ];
+
+  const esc = value => String(value ?? "").replace(/[&<>\"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[char]));
+  const today = () => new Date().toISOString().slice(0,10);
+  const stamp = () => new Date().toISOString();
+  const deepCopy = obj => JSON.parse(JSON.stringify(obj));
+  const visualBlank = () => Object.fromEntries(VISUAL_ITEMS.map(([key]) => [key,""]));
+
+  function baseEquipment(id,name,declaredCapacity,referenceNote,createdAt) {
+    return {
+      id,createdAt,recordStatus:"ativo",referenceOnly:true,referenceConfirmed:"",
+      name,category:"Sistema HVAC — confirmar tipo",manufacturer:"",model:"",serial:"",tag:"",
+      declaredCapacity,plateCapacity:"",location:"",zoneId:"",association:"",referenceNote,
+      operatingState:"",normalCommandObserved:"",displayAlarm:"",visual:visualBlank(),visualNotes:"",
+      fact:"",report:"",interpretation:"",hypothesis:"",exception:{mode:"none",reason:"",authorization:"",isolation:"",action:"",reading:"",conditions:""},
+      photos:[],extraPhotoCount:0,keepThumbnails:true
+    };
+  }
+
+  function sentinelEquipment(id,name,referenceNote,createdAt) {
+    const record = baseEquipment(id,name,"",referenceNote,createdAt);
+    return Object.assign(record,{recordStatus:"nao_inspecionado",referenceOnly:false,referenceConfirmed:"na",sentinel:true});
+  }
+
+  function initialState() {
+    const base = Date.now() - 10000;
+    return {
+      schema:SCHEMA,
+      createdAt:stamp(),
+      updatedAt:stamp(),
+      visit:{inspector:"",date:today(),start:"",end:"",store:"Adidas — Camaçari",companion:"",purpose:"Coleta visual, operacional e documental para diagnóstico posterior do especialista.",arrivalContext:"",instrumentLimitations:"Termohigrômetro não disponível; sem medição independente de temperatura/UR."},
+      safety:{localAuthorization:false,normalCommandsOnly:false,noLiveExposure:false,stopConditions:false,stopNote:""},
+      interview:{source:"",schedule:"",currentComplaint:"",comfort:"",associatedSignals:"",normalControls:"",timeline:"",maintenance:"",failures:"",priorIntervention:"",documentsSeen:"",documentsPromised:""},
+      trace:{priorIdentity:"",currentIdentity:"",match:"",sourceReference:"",matchBasis:""},
+      zones:[],
+      equipment:[
+        baseEquipment("CAM-EQ01","Sistema Hitachi","30 TR","Referência pré-campo: capacidade, placa, configuração e localização a confirmar.",base+1),
+        baseEquipment("CAM-EQ02","Condensadora associada 1 — Hitachi","","Referência pré-campo: confirmar existência e associação física com o sistema indicado.",base+2),
+        baseEquipment("CAM-EQ03","Condensadora associada 2 — Hitachi","","Referência pré-campo: confirmar existência e associação física com o sistema indicado.",base+3),
+        baseEquipment("CAM-EQ04","Sistema Carrier","25 TR","Referência pré-campo: capacidade, placa, configuração e localização a confirmar.",base+4),
+        sentinelEquipment("CAM-EQ05","Demais equipamentos / ativos","Registro sentinela: use “+ Adicionar equipamento” para cada ativo efetivamente encontrado.",base+5)
+      ],
+      findings:[],
+      close:{documentsReceived:"",documentsPending:"",originalsLocation:"",questions:{identity:"",visual:"",tests:"",report:""},reconciled:false,separatedEvidence:false,acceptedLimit:false,traceabilityHandled:false,handoffSummary:""}
+    };
+  }
+
+  let state = loadState();
+  let saveTimer = null;
+  let activeTab = "inicio";
+
+  function loadState() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      return parsed ? normalizeState(parsed) : initialState();
+    } catch (error) {
+      return initialState();
+    }
+  }
+
+  function normalizeState(raw) {
+    const fresh = initialState();
+    const merged = Object.assign({},fresh,raw);
+    merged.visit = Object.assign({},fresh.visit,raw.visit||{});
+    merged.safety = Object.assign({},fresh.safety,raw.safety||{});
+    merged.interview = Object.assign({},fresh.interview,raw.interview||{});
+    merged.trace = Object.assign({},fresh.trace,raw.trace||{});
+    merged.close = Object.assign({},fresh.close,raw.close||{});
+    merged.close.questions = Object.assign({},fresh.close.questions,(raw.close&&raw.close.questions)||{});
+    merged.zones = Array.isArray(raw.zones) ? raw.zones : [];
+    merged.equipment = Array.isArray(raw.equipment) && raw.equipment.length ? raw.equipment : fresh.equipment;
+    merged.findings = Array.isArray(raw.findings) ? raw.findings : [];
+    merged.zones.forEach(normalizeRecord);
+    merged.equipment.forEach(record => { normalizeRecord(record); record.visual=Object.assign(visualBlank(),record.visual||{}); record.exception=Object.assign({mode:"none",reason:"",authorization:"",isolation:"",action:"",reading:"",conditions:""},record.exception||{}); });
+    const sentinel = merged.equipment.find(record => record.id==="CAM-EQ05");
+    if (sentinel) Object.assign(sentinel,{recordStatus:"nao_inspecionado",referenceOnly:false,referenceConfirmed:"na",sentinel:true});
+    merged.findings.forEach(record => { normalizeRecord(record); record.trace=Object.assign({match:"",basis:""},record.trace||{}); });
+    return merged;
+  }
+
+  function normalizeRecord(record) {
+    record.photos = Array.isArray(record.photos) ? record.photos : [];
+    record.extraPhotoCount = Math.max(0,Number(record.extraPhotoCount)||0);
+    record.keepThumbnails = record.keepThumbnails !== false;
+    record.recordStatus = record.recordStatus || "ativo";
+    record.createdAt = record.createdAt || Date.now();
+  }
+
+  function persistNow(updateStatus=true) {
+    const status = document.getElementById("save-status");
+    try {
+      state.updatedAt = stamp();
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+      if (updateStatus && status) status.firstChild.textContent = "Salvo " + new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+      return true;
+    } catch (error) {
+      if (updateStatus && status) {
+        status.firstChild.textContent = "Falha ao salvar";
+        status.style.color = "#ffd4d4";
+      }
+      return false;
+    }
+  }
+
+  function scheduleSave() {
+    clearTimeout(saveTimer);
+    const status = document.getElementById("save-status");
+    if (status) status.firstChild.textContent = "Salvando…";
+    saveTimer = setTimeout(() => { saveTimer=null; persistNow(true); },250);
+  }
+
+  function flushSave() {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    persistNow(false);
+  }
+
+  function getPath(path) {
+    return path.split(".").reduce((obj,key) => obj == null ? undefined : obj[key],state);
+  }
+
+  function setPath(path,value) {
+    const keys = path.split(".");
+    let obj = state;
+    keys.slice(0,-1).forEach(key => { obj[key] = obj[key] || {}; obj = obj[key]; });
+    obj[keys[keys.length-1]] = value;
+  }
+
+  function hydrateStatic() {
+    document.querySelectorAll("[data-path]").forEach(input => {
+      const value = getPath(input.dataset.path);
+      if (input.type === "checkbox") input.checked = Boolean(value);
+      else input.value = value ?? "";
+    });
+  }
+
+  function safetyReady() {
+    return SAFETY_KEYS.every(key => state.safety[key] === true);
+  }
+
+  function updateSafety() {
+    const ready = safetyReady();
+    const box = document.getElementById("safety-result");
+    box.className = "banner " + (ready ? "ok" : "warn");
+    box.textContent = ready ? "Gate concluído. Prossiga sem ampliar o escopo." : "Gate pendente: confirme os quatro itens ou registre o impedimento e feche a visita.";
+    document.querySelectorAll("[data-tab]").forEach(button => {
+      if (TECH_TABS.has(button.dataset.tab)) button.setAttribute("aria-disabled",String(!ready));
+    });
+  }
+
+  function updateTrace() {
+    const box = document.getElementById("trace-result");
+    const match = state.trace.match;
+    if (match === "yes" && state.trace.priorIdentity.trim() && state.trace.currentIdentity.trim() && state.trace.matchBasis.trim()) {
+      box.className = "banner ok";
+      box.textContent = "Correspondência registrada como confirmada, com base a ser revisada pelo especialista.";
+    } else if (match === "no") {
+      box.className = "banner warn";
+      box.textContent = "Não é a mesma serpentina: não tratar o achado atual como reincidência da intervenção anterior.";
+    } else {
+      box.className = "banner warn";
+      box.textContent = "Identidade insuficiente ou indeterminada: não alegar reincidência nem atribuir material, método ou serviço anterior.";
+    }
+  }
+
+  function switchTab(name) {
+    if (TECH_TABS.has(name) && !safetyReady()) {
+      activeTab = "inicio";
+      document.getElementById("safety-card").scrollIntoView({behavior:"smooth",block:"start"});
+      document.getElementById("safety-result").textContent = "Conclua o gate de segurança antes da etapa técnica.";
+      return;
+    }
+    activeTab = name;
+    document.querySelectorAll(".section").forEach(section => section.classList.toggle("active",section.dataset.section===name));
+    document.querySelectorAll("[data-tab]").forEach(button => {
+      const on = button.dataset.tab === name;
+      button.classList.toggle("active",on);
+      if (on) button.setAttribute("aria-current","page"); else button.removeAttribute("aria-current");
+    });
+    if (name === "fechar") renderClose();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function nextId(prefix,list) {
+    const max = list.reduce((value,item) => Math.max(value,Number(String(item.id||"").replace(prefix,""))||0),0);
+    return prefix + String(max+1).padStart(2,"0");
+  }
+
+  function addZone() {
+    state.zones.push({
+      id:nextId("CAM-Z",state.zones),createdAt:Date.now(),recordStatus:"ativo",name:"",type:"Área de vendas",location:"",occupancy:"",servedBy:"",conditions:"",supplyReturn:"",obstructions:"",moisture:"",fact:"",report:"",interpretation:"",hypothesis:"",photos:[],extraPhotoCount:0,keepThumbnails:true
+    });
+    scheduleSave(); renderZones(); renderEquipment(); renderFindings();
+  }
+
+  function addEquipment() {
+    state.equipment.push(baseEquipment(nextId("CAM-EQ",state.equipment),"","","Ativo incluído em campo; identificação integral pendente.",Date.now()));
+    const record = state.equipment[state.equipment.length-1];
+    record.referenceOnly = false;
+    scheduleSave(); renderEquipment(); renderFindings();
+  }
+
+  function addFinding() {
+    state.findings.push({
+      id:nextId("CAM-ACH",state.findings),createdAt:Date.now(),recordStatus:"ativo",title:"",zoneId:"",equipmentId:"",location:"",category:"Visual",urgency:"A avaliar pelo especialista",fact:"",report:"",interpretation:"",hypothesis:"",limitations:"",trace:{match:"",basis:""},safeAction:"",photos:[],extraPhotoCount:0,keepThumbnails:true
+    });
+    scheduleSave(); renderFindings();
+  }
+
+  function recordBy(listName,id) {
+    return (state[listName]||[]).find(item => item.id === id);
+  }
+
+  function optionsHtml(options,current) {
+    return options.map(([value,label]) => `<option value="${esc(value)}" ${String(current??"")===String(value)?"selected":""}>${esc(label)}</option>`).join("");
+  }
+
+  function statusSelect(record,listName) {
+    if (record.sentinel) return '<span class="badge muted">Sentinela — não contabilizada</span>';
+    return `<label>Situação do registro<select data-list="${listName}" data-id="${esc(record.id)}" data-field="recordStatus"><option value="ativo" ${record.recordStatus==="ativo"?"selected":""}>Ativo</option><option value="nao_inspecionado" ${record.recordStatus==="nao_inspecionado"?"selected":""}>Não inspecionado / acesso impedido</option><option value="engano" ${record.recordStatus==="engano"?"selected":""}>Criado por engano — manter no histórico</option></select></label>`;
+  }
+
+  function evidenceFields(record,listName) {
+    return `<fieldset class="span-all"><legend>Separação da evidência</legend>
+      <div class="grid">
+        <div><label>Fato observado<textarea data-list="${listName}" data-id="${esc(record.id)}" data-field="fact" placeholder="O que foi visto/feito, sem causa presumida">${esc(record.fact)}</textarea></label></div>
+        <div><label>Relato atribuído<textarea data-list="${listName}" data-id="${esc(record.id)}" data-field="report" placeholder="Quem informou e o que informou">${esc(record.report)}</textarea></label></div>
+        <div><label>Interpretação preliminar<textarea data-list="${listName}" data-id="${esc(record.id)}" data-field="interpretation" placeholder="Leitura separada do fato; sujeita à revisão">${esc(record.interpretation)}</textarea></label></div>
+        <div><label>Hipótese para validar<textarea data-list="${listName}" data-id="${esc(record.id)}" data-field="hypothesis" placeholder="Possibilidade, teste necessário e alternativas">${esc(record.hypothesis)}</textarea></label></div>
+      </div>
+    </fieldset>`;
+  }
+
+  function renderZones() {
+    const list = document.getElementById("zone-list");
+    if (!state.zones.length) {
+      list.innerHTML = '<div class="empty">Nenhum ambiente registrado. Comece pela área da queixa e depois percorra zonas adjacentes, retorno, insuflação e áreas técnicas acessíveis.</div>';
+      return;
+    }
+    list.innerHTML = state.zones.map(record => `<article class="card" data-record-list="zones" data-record-id="${esc(record.id)}">
+      <div class="card-id"><div><div class="id-code">${esc(record.id)}</div><span class="help">Ambiente / zona de observação</span></div>${statusSelect(record,"zones")}</div>
+      <div class="grid three">
+        <div><label>Nome do ambiente<input type="text" data-list="zones" data-id="${esc(record.id)}" data-field="name" value="${esc(record.name)}" placeholder="Ex.: salão de vendas — fundo"></label></div>
+        <div><label>Tipo<select data-list="zones" data-id="${esc(record.id)}" data-field="type">${optionsHtml([["Área de vendas","Área de vendas"],["Estoque","Estoque"],["Provadores","Provadores"],["Caixa/atendimento","Caixa/atendimento"],["Administrativo","Administrativo"],["Área técnica","Área técnica"],["Externo/cobertura","Externo/cobertura"],["Outro","Outro"]],record.type)}</select></label></div>
+        <div><label>Localização / referência<input type="text" data-list="zones" data-id="${esc(record.id)}" data-field="location" value="${esc(record.location)}" placeholder="Piso, eixo, proximidade"></label></div>
+        <div><label>Uso e ocupação observada<textarea data-list="zones" data-id="${esc(record.id)}" data-field="occupancy" placeholder="Pessoas, portas, cargas internas, horário">${esc(record.occupancy)}</textarea></label></div>
+        <div><label>Equipamento(s) que parecem atender<textarea data-list="zones" data-id="${esc(record.id)}" data-field="servedBy" placeholder="TAG/posição; marcar como associação a confirmar">${esc(record.servedBy)}</textarea></label></div>
+        <div><label>Condição térmica percebida <span class="help">Somente comparação entre locais/momentos; sem temperatura, UR ou conforto quantitativo.</span><textarea data-list="zones" data-id="${esc(record.id)}" data-field="conditions" placeholder="Percepção comparativa, horário e condição operacional">${esc(record.conditions)}</textarea></label></div>
+        <div><label>Insuflação / retorno visíveis<textarea data-list="zones" data-id="${esc(record.id)}" data-field="supplyReturn" placeholder="Posição, sensação de fluxo, ruído, grelhas e distribuição">${esc(record.supplyReturn)}</textarea></label></div>
+        <div><label>Obstruções e cargas externas<textarea data-list="zones" data-id="${esc(record.id)}" data-field="obstructions" placeholder="Mobiliário, displays, portas, sol, fontes de calor">${esc(record.obstructions)}</textarea></label></div>
+        <div><label>Umidade, água, odor ou danos<textarea data-list="zones" data-id="${esc(record.id)}" data-field="moisture" placeholder="Local exato, extensão e foto de contexto">${esc(record.moisture)}</textarea></label></div>
+        ${evidenceFields(record,"zones")}
+      </div>
+      <div data-photo-host="zones" data-photo-id="${esc(record.id)}"></div>
+    </article>`).join("");
+    attachPhotoWidgets(list);
+  }
+
+  function renderEquipment() {
+    const list = document.getElementById("equipment-list");
+    list.innerHTML = state.equipment.map(record => {
+      if (record.sentinel) return `<article class="card" data-record-list="equipment" data-record-id="${esc(record.id)}">
+        <div class="card-id"><div><div class="id-code">${esc(record.id)}</div><span class="badge muted">Sentinela — não é ativo inventariado</span></div>${statusSelect(record,"equipment")}</div>
+        <p><b>Demais equipamentos:</b> ao localizar um ativo adicional, use o botão <b>“+ Adicionar equipamento”</b> e faça um registro próprio. Esta sentinela permanece não inspecionada, não recebe fotos e não entra nas métricas.</p>
+      </article>`;
+      const zoneOptions = [["","Não associado"]].concat(state.zones.map(zone => [zone.id,`${zone.id} — ${zone.name||"sem nome"}`]));
+      return `<article class="card" data-record-list="equipment" data-record-id="${esc(record.id)}">
+        <div class="card-id"><div><div class="id-code">${esc(record.id)}</div><span class="badge ${record.referenceOnly?"reference":"muted"}">${record.referenceOnly?"Referência pré-campo — confirmar":"Incluído em campo"}</span></div>${statusSelect(record,"equipment")}</div>
+        <div class="equipment-layout">
+          <div>
+            <h3>Identidade física</h3>
+            <label>Nome curto<input type="text" data-list="equipment" data-id="${esc(record.id)}" data-field="name" value="${esc(record.name)}" placeholder="Tipo + posição"></label>
+            <label>Referência a confirmar<textarea data-list="equipment" data-id="${esc(record.id)}" data-field="referenceNote">${esc(record.referenceNote)}</textarea></label>
+            <label>Status da referência<select data-list="equipment" data-id="${esc(record.id)}" data-field="referenceConfirmed"><option value="" ${!record.referenceConfirmed?"selected":""}>Não conferida</option><option value="confirmed" ${record.referenceConfirmed==="confirmed"?"selected":""}>Confirmada fisicamente</option><option value="different" ${record.referenceConfirmed==="different"?"selected":""}>Divergente — registrar dado de placa</option><option value="not_found" ${record.referenceConfirmed==="not_found"?"selected":""}>Não localizado</option><option value="na" ${record.referenceConfirmed==="na"?"selected":""}>Não é referência pré-campo</option></select></label>
+            <div class="grid">
+              <div><label>Fabricante<input type="text" data-list="equipment" data-id="${esc(record.id)}" data-field="manufacturer" value="${esc(record.manufacturer)}"></label></div>
+              <div><label>Modelo<input type="text" data-list="equipment" data-id="${esc(record.id)}" data-field="model" value="${esc(record.model)}"></label></div>
+              <div><label>Nº de série<input type="text" data-list="equipment" data-id="${esc(record.id)}" data-field="serial" value="${esc(record.serial)}"></label></div>
+              <div><label>TAG / código local<input type="text" data-list="equipment" data-id="${esc(record.id)}" data-field="tag" value="${esc(record.tag)}"></label></div>
+              <div><label>Capacidade indicada antes da visita<input type="text" data-list="equipment" data-id="${esc(record.id)}" data-field="declaredCapacity" value="${esc(record.declaredCapacity)}" placeholder="Sempre a confirmar"></label></div>
+              <div><label>Capacidade lida na placa<input type="text" data-list="equipment" data-id="${esc(record.id)}" data-field="plateCapacity" value="${esc(record.plateCapacity)}"></label></div>
+              <div><label>Localização física<input type="text" data-list="equipment" data-id="${esc(record.id)}" data-field="location" value="${esc(record.location)}"></label></div>
+              <div><label>Ambiente associado<select data-list="equipment" data-id="${esc(record.id)}" data-field="zoneId">${optionsHtml(zoneOptions,record.zoneId)}</select></label></div>
+            </div>
+            <label>Associação com outras unidades / circuitos<textarea data-list="equipment" data-id="${esc(record.id)}" data-field="association" placeholder="Origem e destino das linhas/dutos; o que foi fisicamente confirmado">${esc(record.association)}</textarea></label>
+          </div>
+          <div>
+            <h3>Observação visual guiada</h3>
+            <table class="visual-table">
+              <thead><tr><th>Item</th><th>Condição</th></tr></thead>
+              <tbody>${VISUAL_ITEMS.map(([key,label,help]) => `<tr><td>${esc(label)}<span class="help">${esc(help)}</span></td><td><select aria-label="${esc(label)}" data-list="equipment" data-id="${esc(record.id)}" data-nested="visual" data-field="${esc(key)}">${optionsHtml(VISUAL_OPTIONS,record.visual[key])}</select></td></tr>`).join("")}</tbody>
+            </table>
+            <label>Notas do checklist visual<textarea data-list="equipment" data-id="${esc(record.id)}" data-field="visualNotes" placeholder="Associe cada anotação a local e foto; não conclua vazamento/carga">${esc(record.visualNotes)}</textarea></label>
+          </div>
+          <fieldset class="span-all"><legend>Operação observada — somente comandos normais</legend>
+            <div class="banner warn">Sem bypass, ponte, acionamento manual de contator, reset repetitivo ou alteração de proteção. Não forçar setpoint apenas para “testar”. Se não houver autorização ou resposta segura, registre “não realizado”.</div>
+            <div class="grid three">
+              <div><label>Estado na chegada<select data-list="equipment" data-id="${esc(record.id)}" data-field="operatingState">${optionsHtml([["","Não observado"],["Operando","Operando"],["Parado por comando normal","Parado por comando normal"],["Indisponível / falha indicada","Indisponível / falha indicada"],["Desenergizado","Desenergizado"],["Acesso impedido","Acesso impedido"]],record.operatingState)}</select></label></div>
+              <div><label>Comando normal observado<textarea data-list="equipment" data-id="${esc(record.id)}" data-field="normalCommandObserved" placeholder="Quem comandou, qual comando, horário e resposta">${esc(record.normalCommandObserved)}</textarea></label></div>
+              <div><label>Display / alarme / setpoint indicado <span class="help">É indicação do equipamento, não medição independente. Fotografe tela, fonte/equipamento e registre o horário.</span><textarea data-list="equipment" data-id="${esc(record.id)}" data-field="displayAlarm" placeholder="Texto/código exatamente como mostrado; inclua horário e foto de contexto">${esc(record.displayAlarm)}</textarea></label></div>
+            </div>
+          </fieldset>
+          ${evidenceFields(record,"equipment")}
+          <details class="span-all">
+            <summary>Exceção documentada — abertura ou medição (padrão: não realizar)</summary>
+            <div>
+              <div class="banner danger"><strong>Não realizar medição</strong> se exigir abrir compartimento energizado, remover barreira, acessar partes vivas ou atuar fora de sua capacitação/autorização. Corrente somente em condutor individual já acessível em condição reconhecidamente segura; tensão somente com procedimento, capacitação e autorização. Sem manifold e sem intervenção frigorífica.</div>
+              <label>Decisão<select data-list="equipment" data-id="${esc(record.id)}" data-nested="exception" data-field="mode"><option value="none">Não realizado (padrão)</option><option value="open_off">Gabinete aberto desenergizado, isolado e autorizado</option><option value="external">Observação/medição externa sem exposição</option><option value="other">Outra ação excepcional autorizada</option></select></label>
+              <div class="grid">
+                <div><label>Necessidade real / motivo<textarea data-list="equipment" data-id="${esc(record.id)}" data-nested="exception" data-field="reason">${esc(record.exception.reason)}</textarea></label></div>
+                <div><label>Autorização local (nome/função/hora)<textarea data-list="equipment" data-id="${esc(record.id)}" data-nested="exception" data-field="authorization">${esc(record.exception.authorization)}</textarea></label></div>
+                <div><label>Desenergização, bloqueio e condição segura<textarea data-list="equipment" data-id="${esc(record.id)}" data-nested="exception" data-field="isolation">${esc(record.exception.isolation)}</textarea></label></div>
+                <div><label>O que foi efetivamente feito<textarea data-list="equipment" data-id="${esc(record.id)}" data-nested="exception" data-field="action">${esc(record.exception.action)}</textarea></label></div>
+                <div><label>Leitura obtida, unidade e ponto exato<textarea data-list="equipment" data-id="${esc(record.id)}" data-nested="exception" data-field="reading">${esc(record.exception.reading)}</textarea></label></div>
+                <div><label>Condição operacional no momento<textarea data-list="equipment" data-id="${esc(record.id)}" data-nested="exception" data-field="conditions">${esc(record.exception.conditions)}</textarea></label></div>
+              </div>
+            </div>
+          </details>
+        </div>
+        <div data-photo-host="equipment" data-photo-id="${esc(record.id)}"></div>
+      </article>`;
+    }).join("");
+    attachPhotoWidgets(list);
+  }
+
+  function renderFindings() {
+    const list = document.getElementById("finding-list");
+    if (!state.findings.length) {
+      list.innerHTML = '<div class="empty">Nenhum achado registrado. Um achado deve ter localização, fato objetivo e evidência — ou ficar explicitamente como relato/hipótese.</div>';
+      return;
+    }
+    const zoneOptions = [["","Sem vínculo"]].concat(state.zones.map(zone => [zone.id,`${zone.id} — ${zone.name||"sem nome"}`]));
+    const equipmentOptions = [["","Sem vínculo"]].concat(state.equipment.filter(eq=>!eq.sentinel).map(eq => [eq.id,`${eq.id} — ${eq.name||"sem nome"}`]));
+    list.innerHTML = state.findings.map(record => `<article class="card" data-record-list="findings" data-record-id="${esc(record.id)}">
+      <div class="card-id"><div><div class="id-code">${esc(record.id)}</div><span class="help">Achado / condição registrada</span></div>${statusSelect(record,"findings")}</div>
+      <div class="grid three">
+        <div><label>Título descritivo<input type="text" data-list="findings" data-id="${esc(record.id)}" data-field="title" value="${esc(record.title)}" placeholder="Ex.: oxidação aparente em trecho inferior"></label></div>
+        <div><label>Ambiente<select data-list="findings" data-id="${esc(record.id)}" data-field="zoneId">${optionsHtml(zoneOptions,record.zoneId)}</select></label></div>
+        <div><label>Equipamento<select data-list="findings" data-id="${esc(record.id)}" data-field="equipmentId">${optionsHtml(equipmentOptions,record.equipmentId)}</select></label></div>
+        <div><label>Local exato<input type="text" data-list="findings" data-id="${esc(record.id)}" data-field="location" value="${esc(record.location)}" placeholder="Face, lado, altura, conexão, referência"></label></div>
+        <div><label>Natureza<select data-list="findings" data-id="${esc(record.id)}" data-field="category">${optionsHtml([["Visual","Visual"],["Operacional por comando normal","Operacional por comando normal"],["Documental","Documental"],["Relato sem confirmação","Relato sem confirmação"],["Acesso / segurança","Acesso / segurança"]],record.category)}</select></label></div>
+        <div><label>Triagem preliminar<select data-list="findings" data-id="${esc(record.id)}" data-field="urgency">${optionsHtml([["A avaliar pelo especialista","A avaliar pelo especialista"],["Informativo","Informativo"],["Atenção breve","Atenção breve"],["Interromper e escalar por segurança","Interromper e escalar por segurança"]],record.urgency)}</select></label></div>
+        ${evidenceFields(record,"findings")}
+        <div class="span-all"><label>Limitações específicas<textarea data-list="findings" data-id="${esc(record.id)}" data-field="limitations" placeholder="O que não foi visto, medido ou confirmado; alternativas que permanecem abertas">${esc(record.limitations)}</textarea></label></div>
+        <fieldset class="span-all"><legend>Rastreabilidade com intervenção anterior</legend>
+          <label>É fisicamente a mesma serpentina indicada no histórico?<select data-list="findings" data-id="${esc(record.id)}" data-nested="trace" data-field="match"><option value="">Não avaliado</option><option value="yes">Sim — identidade demonstrada</option><option value="no">Não</option><option value="indeterminate">Indeterminado</option><option value="na">Não se aplica</option></select></label>
+          <label>Base objetiva<textarea data-list="findings" data-id="${esc(record.id)}" data-nested="trace" data-field="basis" placeholder="TAG/série/posição/foto/documento. Sem base suficiente, não classificar como reincidência.">${esc(record.trace.basis)}</textarea></label>
+        </fieldset>
+        <div class="span-all"><label>Ação imediata segura / preservação de evidência<textarea data-list="findings" data-id="${esc(record.id)}" data-field="safeAction" placeholder="Ex.: fotografar, sinalizar e comunicar. Não prescrever intervenção técnica sem diagnóstico.">${esc(record.safeAction)}</textarea></label></div>
+      </div>
+      <div class="banner danger"><strong>Limite obrigatório:</strong> este achado não prova vazamento ativo, carga, desempenho frigorífico ou condenação. Sem identidade física, também não prova reincidência nem autoria/material de serviço anterior.</div>
+      <div data-photo-host="findings" data-photo-id="${esc(record.id)}"></div>
+    </article>`).join("");
+    attachPhotoWidgets(list);
+  }
+
+  const photoDbPromise = new Promise(resolve => {
+    try {
+      const request = indexedDB.open(PHOTO_DB,1);
+      request.onupgradeneeded = event => event.target.result.createObjectStore("thumbs");
+      request.onsuccess = event => resolve(event.target.result);
+      request.onerror = () => resolve(null);
+    } catch (error) { resolve(null); }
+  });
+
+  async function thumbPut(key,value) {
+    const db = await photoDbPromise;
+    if (!db) return false;
+    return new Promise(resolve => {
+      const transaction = db.transaction("thumbs","readwrite");
+      transaction.objectStore("thumbs").put(value,key);
+      transaction.oncomplete = () => resolve(true);
+      transaction.onerror = () => resolve(false);
+    });
+  }
+
+  async function thumbGet(key) {
+    const db = await photoDbPromise;
+    if (!db) return null;
+    return new Promise(resolve => {
+      const request = db.transaction("thumbs","readonly").objectStore("thumbs").get(key);
+      request.onsuccess = () => resolve(request.result||null);
+      request.onerror = () => resolve(null);
+    });
+  }
+
+  function makeThumbnail(file) {
+    return new Promise(resolve => {
+      const image = new Image();
+      const url = URL.createObjectURL(file);
+      image.onload = () => {
+        const max = 900;
+        const ratio = Math.min(1,max/Math.max(image.naturalWidth,image.naturalHeight));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1,Math.round(image.naturalWidth*ratio));
+        canvas.height = Math.max(1,Math.round(image.naturalHeight*ratio));
+        canvas.getContext("2d",{alpha:false}).drawImage(image,0,0,canvas.width,canvas.height);
+        URL.revokeObjectURL(url);
+        resolve(canvas.toDataURL("image/jpeg",.68));
+      };
+      image.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+      image.src = url;
+    });
+  }
+
+  function allPhotoRecords() {
+    return [...state.zones,...state.equipment.filter(record=>!record.sentinel),...state.findings].sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  }
+
+  function photoCount(record) {
+    return (record.photos||[]).length + Math.max(0,Number(record.extraPhotoCount)||0);
+  }
+
+  function photoRange(record) {
+    let first = 1;
+    for (const item of allPhotoRecords()) {
+      const count = photoCount(item);
+      if (item.id === record.id) {
+        if (!count) return "sem fotos";
+        const last = first + count - 1;
+        return count === 1 ? `foto ${String(first).padStart(3,"0")}` : `fotos ${String(first).padStart(3,"0")}–${String(last).padStart(3,"0")}`;
+      }
+      first += count;
+    }
+    return "sem fotos";
+  }
+
+  function attachPhotoWidgets(scope) {
+    scope.querySelectorAll("[data-photo-host]").forEach(host => {
+      const listName = host.dataset.photoHost;
+      const record = recordBy(listName,host.dataset.photoId);
+      const fragment = document.getElementById("photo-widget-template").content.cloneNode(true);
+      const root = fragment.querySelector(".photo-tools");
+      root.dataset.photoList = listName;
+      root.dataset.photoId = record.id;
+      root.querySelector("[data-keep-thumbnails]").checked = record.keepThumbnails !== false;
+      root.querySelector("[data-extra-count]").textContent = record.extraPhotoCount||0;
+      root.querySelector("[data-photo-range]").textContent = photoRange(record);
+      host.appendChild(fragment);
+      paintThumbs(root,record);
+    });
+  }
+
+  async function paintThumbs(root,record) {
+    const box = root.querySelector("[data-thumbs]");
+    box.innerHTML = "";
+    for (const photo of record.photos||[]) {
+      const item = document.createElement("div");
+      item.className = "thumb";
+      if (photo.hasThumbnail) {
+        const data = await thumbGet(photo.key);
+        if (data) {
+          const image = document.createElement("img");
+          image.src = data;
+          image.alt = photo.caption || `Miniatura ${photo.name||""}`;
+          item.appendChild(image);
+        } else item.innerHTML = '<div class="no-thumb">Miniatura indisponível neste navegador</div>';
+      } else item.innerHTML = '<div class="no-thumb">Foto contada sem miniatura</div>';
+      const caption = document.createElement("input");
+      caption.type = "text";
+      caption.placeholder = "Legenda / detalhe";
+      caption.value = photo.caption||"";
+      caption.dataset.photoCaption = photo.key;
+      caption.setAttribute("aria-label","Legenda da foto");
+      item.appendChild(caption);
+      box.appendChild(item);
+    }
+  }
+
+  async function handlePhotoInput(input) {
+    const root = input.closest(".photo-tools");
+    const record = recordBy(root.dataset.photoList,root.dataset.photoId);
+    const files = Array.from(input.files||[]);
+    if (!files.length) return;
+    const status = root.querySelector("[data-photo-range]");
+    status.textContent = "processando…";
+    for (const file of files) {
+      const key = record.id + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+      let hasThumbnail = false;
+      if (record.keepThumbnails !== false) {
+        const data = await makeThumbnail(file);
+        if (data) hasThumbnail = await thumbPut(key,data);
+      }
+      record.photos.push({key,name:file.name||"captura",type:file.type||"image",size:file.size||0,addedAt:stamp(),caption:"",hasThumbnail});
+    }
+    input.value = "";
+    scheduleSave();
+    renderAllDynamic();
+  }
+
+  function renderAllDynamic() {
+    renderZones();
+    renderEquipment();
+    renderFindings();
+    if (activeTab === "fechar") renderClose();
+  }
+
+  function getGaps() {
+    const gaps = [];
+    if (!safetyReady()) gaps.push("Gate de segurança incompleto ou visita encerrada antes da inspeção técnica.");
+    if (!state.visit.inspector.trim()) gaps.push("Inspetor não identificado.");
+    if (!state.visit.start) gaps.push("Horário de início não registrado.");
+    const instrumentLimit = String(state.visit.instrumentLimitations||"").trim();
+    if (instrumentLimit) gaps.push(`Limitação instrumental declarada: ${instrumentLimit}`);
+    else gaps.push("Instrumentos disponíveis e limitações da visita não foram registrados.");
+    if (!state.zones.length) gaps.push("Nenhum ambiente/zona registrado.");
+    const activeEquipment = state.equipment.filter(item => item.recordStatus==="ativo" && !item.sentinel);
+    const pendingRefs = activeEquipment.filter(item => item.referenceOnly && !item.referenceConfirmed);
+    if (pendingRefs.length) gaps.push(`${pendingRefs.length} referência(s) pré-campo ainda sem confirmação física.`);
+    const weakId = activeEquipment.filter(item => item.id!=="CAM-EQ05" && !item.tag && !item.serial && !item.model);
+    if (weakId.length) gaps.push(`${weakId.length} equipamento(s) sem TAG, série ou modelo registrado.`);
+    if (!state.trace.match) gaps.push("Correspondência da serpentina da intervenção anterior não avaliada.");
+    if (state.trace.match==="yes" && (!state.trace.priorIdentity.trim() || !state.trace.currentIdentity.trim() || !state.trace.matchBasis.trim())) gaps.push("Correspondência marcada como confirmada, mas identidade/base objetiva está incompleta.");
+    const sparseFindings = state.findings.filter(item => item.recordStatus==="ativo" && !item.fact.trim() && !item.report.trim());
+    if (sparseFindings.length) gaps.push(`${sparseFindings.length} achado(s) sem fato nem relato registrado.`);
+    const unlocated = state.findings.filter(item => item.recordStatus==="ativo" && !item.location.trim() && !item.zoneId && !item.equipmentId);
+    if (unlocated.length) gaps.push(`${unlocated.length} achado(s) sem localização ou vínculo.`);
+    if (!state.close.documentsPending.trim() && !state.close.documentsReceived.trim()) gaps.push("Situação dos documentos não reconciliada.");
+    if (!state.close.acceptedLimit) gaps.push("Declaração de limites da visita ainda não conferida.");
+    if (!state.close.traceabilityHandled) gaps.push("Tratamento da rastreabilidade ainda não conferido no fechamento.");
+    return gaps;
+  }
+
+  function renderClose() {
+    const activeZones = state.zones.filter(item => item.recordStatus==="ativo").length;
+    const activeEquipment = state.equipment.filter(item => item.recordStatus==="ativo" && !item.sentinel).length;
+    const activeFindings = state.findings.filter(item => item.recordStatus==="ativo").length;
+    const photos = allPhotoRecords().reduce((sum,item)=>sum+photoCount(item),0);
+    const confirmedRefs = state.equipment.filter(item => item.referenceOnly && item.referenceConfirmed==="confirmed").length;
+    document.getElementById("metrics").innerHTML = `
+      <div class="metric"><b>${activeZones}</b>ambientes</div>
+      <div class="metric"><b>${activeEquipment}</b>equipamentos</div>
+      <div class="metric"><b>${activeFindings}</b>achados</div>
+      <div class="metric"><b>${photos}</b>fotos contadas</div>
+      <div class="metric"><b>${confirmedRefs}</b>refs. confirmadas</div>`;
+    const gaps = getGaps();
+    document.getElementById("gap-list").innerHTML = gaps.length ? gaps.map(gap=>`<li>${esc(gap)}</li>`).join("") : "<li>Nenhuma lacuna automática detectada; ainda revise qualitativamente o pacote.</li>";
+  }
+
+  async function buildPayload() {
+    const copy = deepCopy(state);
+    const thumbnails = {};
+    for (const record of allPhotoRecords()) {
+      for (const photo of record.photos||[]) {
+        if (photo.hasThumbnail) {
+          const data = await thumbGet(photo.key);
+          if (data) thumbnails[photo.key] = data;
+        }
+      }
+    }
+    return {schema:SCHEMA,exportedAt:stamp(),limitations:[state.visit.instrumentLimitations||"Termohigrômetro não disponível; sem medição independente de temperatura/UR.","Valores de termostato/BMS são apenas indicação do equipamento; não constituem medição independente.","Sem ΔT, conforto quantitativo, capacidade ou desempenho apurado nesta visita.","A visita não prova vazamento ativo.","A visita não determina carga de refrigerante.","A visita não comprova desempenho frigorífico.","A visita não sustenta condenação de equipamento por si só.","Sem identidade física, não há base para alegar reincidência ou atribuir material/serviço anterior."],data:copy,thumbnails};
+  }
+
+  function exportEvidence(record) {
+    return `<dl><dt>Fato</dt><dd>${nl(record.fact)||"—"}</dd><dt>Relato</dt><dd>${nl(record.report)||"—"}</dd><dt>Interpretação</dt><dd>${nl(record.interpretation)||"—"}</dd><dt>Hipótese</dt><dd>${nl(record.hypothesis)||"—"}</dd></dl>`;
+  }
+
+  const nl = value => esc(value||"").replace(/\n/g,"<br>");
+
+  function exportPhotoBlock(record,payload) {
+    const images = (record.photos||[]).map(photo => payload.thumbnails[photo.key] ? `<figure><img src="${payload.thumbnails[photo.key]}" alt="${esc(photo.caption||photo.name||"Foto")}"><figcaption>${esc(photo.caption||photo.name||"Sem legenda")}</figcaption></figure>` : `<div class="photo-ref">Foto sem miniatura: ${esc(photo.caption||photo.name||"registro")}</div>`).join("");
+    return `<p><b>Faixa automática:</b> ${esc(photoRange(record))}</p>${images?`<div class="photos">${images}</div>`:""}`;
+  }
+
+  async function buildHumanHtml() {
+    const payload = await buildPayload();
+    const yesNo = value => value ? "Sim" : "Não";
+    const visitAndSafety = `<section><h2>Visita, instrumentos e segurança</h2><p><b>Objetivo:</b> ${nl(state.visit.purpose)||"—"}</p><p><b>Condições de chegada:</b> ${nl(state.visit.arrivalContext)||"—"}</p><p><b>Instrumentos e limitações:</b> ${nl(state.visit.instrumentLimitations)||"—"}</p><p><b>Gate:</b> autorização local ${yesNo(state.safety.localAuthorization)}; somente comandos normais ${yesNo(state.safety.normalCommandsOnly)}; sem exposição a partes vivas ${yesNo(state.safety.noLiveExposure)}; condições de parada entendidas ${yesNo(state.safety.stopConditions)}.</p><p><b>Condição insegura / impedimento / encerramento:</b> ${nl(state.safety.stopNote)||"—"}</p></section>`;
+    const interview = `<section><h2>Entrevista e rastreabilidade</h2><p><b>Fonte:</b> ${esc(state.interview.source||"—")} · <b>Rotina:</b> ${nl(state.interview.schedule)||"—"}</p><p><b>Queixa atual:</b> ${nl(state.interview.currentComplaint)||"—"}</p><p><b>Conforto e distribuição relatados:</b> ${nl(state.interview.comfort)||"—"}</p><p><b>Sinais associados:</b> ${nl(state.interview.associatedSignals)||"—"}</p><p><b>Comandos/setpoints usuais:</b> ${nl(state.interview.normalControls)||"—"}</p><p><b>Cronologia:</b> ${nl(state.interview.timeline)||"—"}</p><p><b>Manutenção:</b> ${nl(state.interview.maintenance)||"—"}</p><p><b>Falhas/alarmes:</b> ${nl(state.interview.failures)||"—"}</p><p><b>Intervenção anterior:</b> ${nl(state.interview.priorIntervention)||"—"}</p><p><b>Documentos vistos/recebidos:</b> ${nl(state.interview.documentsSeen)||"—"}</p><p><b>Documentos solicitados/prometidos:</b> ${nl(state.interview.documentsPromised)||"—"}</p><p><b>Identidade anterior:</b> ${nl(state.trace.priorIdentity)||"—"}<br><b>Identidade atual:</b> ${nl(state.trace.currentIdentity)||"—"}<br><b>Correspondência:</b> ${esc(state.trace.match||"não avaliada")}<br><b>Fonte documental:</b> ${nl(state.trace.sourceReference)||"—"}<br><b>Base objetiva:</b> ${nl(state.trace.matchBasis)||"—"}</p></section>`;
+    const zones = state.zones.map(record => `<section><h2>${esc(record.id)} — ${esc(record.name||"Ambiente sem nome")}</h2><p><b>Situação:</b> ${esc(record.recordStatus)} · <b>Tipo:</b> ${esc(record.type)} · <b>Local:</b> ${esc(record.location)}</p><p><b>Uso/ocupação:</b> ${nl(record.occupancy)||"—"}</p><p><b>Equipamentos que parecem atender:</b> ${nl(record.servedBy)||"—"}</p><p><b>Condição percebida — somente comparativa:</b> ${nl(record.conditions)||"—"}</p><p><b>Insuflação/retorno:</b> ${nl(record.supplyReturn)||"—"}</p><p><b>Obstruções:</b> ${nl(record.obstructions)||"—"}</p><p><b>Umidade/água/odor:</b> ${nl(record.moisture)||"—"}</p>${exportEvidence(record)}${exportPhotoBlock(record,payload)}</section>`).join("");
+    const sentinelNote = state.equipment.some(record=>record.sentinel) ? '<div class="meta"><b>CAM-EQ05:</b> sentinela administrativa para lembrar o inventário de outros ativos. Não contabilizada nem apresentada como equipamento real.</div>' : "";
+    const equipment = state.equipment.filter(record=>!record.sentinel).map(record => `<section><h2>${esc(record.id)} — ${esc(record.name||"Equipamento sem nome")}</h2><p><b>Situação:</b> ${esc(record.recordStatus)} · <b>Referência:</b> ${record.referenceOnly?"pré-campo":"incluído em campo"} · <b>Confirmação:</b> ${esc(record.referenceConfirmed||"pendente")}</p><p><b>Referência/nota de origem:</b> ${nl(record.referenceNote)||"—"}</p><p><b>Identidade:</b> fabricante ${esc(record.manufacturer||"—")}; modelo ${esc(record.model||"—")}; série ${esc(record.serial||"—")}; TAG ${esc(record.tag||"—")}.</p><p><b>Capacidade indicada antes da visita:</b> ${esc(record.declaredCapacity||"—")} · <b>Capacidade lida na placa:</b> ${esc(record.plateCapacity||"—")}</p><p><b>Local / zona / associação:</b> ${nl(record.location)||"—"} · ${esc(record.zoneId||"sem vínculo")} · ${nl(record.association)||"—"}</p><table><thead><tr><th>Verificação visual</th><th>Registro</th></tr></thead><tbody>${VISUAL_ITEMS.map(([key,label])=>`<tr><td>${esc(label)}</td><td>${esc(record.visual[key]||"não avaliado")}</td></tr>`).join("")}</tbody></table><p><b>Notas visuais:</b> ${nl(record.visualNotes)||"—"}</p><p><b>Operação:</b> ${esc(record.operatingState||"—")} · ${nl(record.normalCommandObserved)||"—"}<br><b>Display/alarme/setpoint indicado:</b> ${nl(record.displayAlarm)||"—"}</p>${exportEvidence(record)}<p><b>Exceção — decisão:</b> ${esc(record.exception.mode||"none")}<br><b>Motivo:</b> ${nl(record.exception.reason)||"—"}<br><b>Autorização:</b> ${nl(record.exception.authorization)||"—"}<br><b>Desenergização/bloqueio/condição segura:</b> ${nl(record.exception.isolation)||"—"}<br><b>Ação efetiva:</b> ${nl(record.exception.action)||"—"}<br><b>Leitura/unidade/ponto:</b> ${nl(record.exception.reading)||"—"}<br><b>Condição operacional:</b> ${nl(record.exception.conditions)||"—"}</p>${exportPhotoBlock(record,payload)}</section>`).join("");
+    const findings = state.findings.map(record => `<section><h2>${esc(record.id)} — ${esc(record.title||"Achado sem título")}</h2><p><b>Situação:</b> ${esc(record.recordStatus)} · <b>Local:</b> ${esc(record.location||"—")} · <b>Vínculos:</b> ${esc(record.zoneId||"—")} / ${esc(record.equipmentId||"—")}</p><p><b>Natureza:</b> ${esc(record.category)} · <b>Triagem:</b> ${esc(record.urgency)}</p>${exportEvidence(record)}<p><b>Limitações:</b> ${nl(record.limitations)||"—"}</p><p><b>Rastreabilidade:</b> ${esc(record.trace.match||"não avaliada")} — ${nl(record.trace.basis)||"sem base registrada"}</p><p><b>Ação segura:</b> ${nl(record.safeAction)||"—"}</p>${exportPhotoBlock(record,payload)}</section>`).join("");
+    const json = JSON.stringify(payload).replace(/</g,"\\u003c");
+    return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pacote de inspeção Camaçari ${esc(state.visit.date)}</title><style>body{font-family:Arial,sans-serif;color:#24313d;max-width:1100px;margin:24px auto;padding:0 18px;line-height:1.4}h1{color:#1d3563}h2{color:#1d3563;border-bottom:2px solid #00a0ac;padding-bottom:4px}section{break-inside:avoid;margin:22px 0}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccd6dc;padding:6px;text-align:left}th{background:#1d3563;color:#fff}dl{display:grid;grid-template-columns:130px 1fr;margin:10px 0}dt,dd{border-top:1px solid #dce3e7;padding:6px;margin:0}dt{font-weight:bold;color:#1d3563}.limit{background:#fff0f0;border-left:5px solid #a32828;padding:12px}.meta{background:#edf7f8;padding:12px;border-radius:8px}.photos{display:flex;flex-wrap:wrap;gap:8px}.photos figure{margin:0;width:180px}.photos img{width:180px;height:135px;object-fit:cover;border:1px solid #bbb;border-radius:6px}.photos figcaption{font-size:11px}.photo-ref{font-size:12px;color:#667480}@media print{body{margin:0;max-width:none}section{break-inside:avoid}}</style></head><body>
+      <h1>COSTARD — Pacote de inspeção HVAC</h1>
+      <div class="meta"><b>Projeto:</b> 052 · <b>Unidade:</b> ${esc(state.visit.store)} · <b>Data:</b> ${esc(state.visit.date)} ${esc(state.visit.start)}–${esc(state.visit.end)} · <b>Inspetor:</b> ${esc(state.visit.inspector)} · <b>Acompanhante:</b> ${esc(state.visit.companion)}</div>
+      <div class="limit"><b>Limites:</b> ${nl(state.visit.instrumentLimitations)||"Termohigrômetro não disponível; sem medição independente de temperatura/UR."} Valores de termostato/BMS são somente indicações do equipamento. Não houve base para ΔT, conforto quantitativo, capacidade ou desempenho. A visita não prova vazamento ativo, carga de refrigerante ou condenação. Sem identidade física, não prova reincidência nem permite atribuir material, método ou serviço anterior.</div>
+      ${visitAndSafety}
+      ${interview}
+      <h1>Ambientes</h1>${zones||"<p>Nenhum ambiente registrado.</p>"}
+      <h1>Equipamentos</h1>${sentinelNote}${equipment||"<p>Nenhum equipamento real registrado.</p>"}
+      <h1>Achados</h1>${findings||"<p>Nenhum achado registrado.</p>"}
+      <section><h2>Fechamento e passagem para Raul / especialista</h2><p><b>Documentos recebidos:</b> ${nl(state.close.documentsReceived)||"—"}</p><p><b>Documentos pendentes:</b> ${nl(state.close.documentsPending)||"—"}</p><p><b>Originais:</b> ${nl(state.close.originalsLocation)||"—"}</p><p><b>Pergunta — identidade:</b> ${nl(state.close.questions.identity)||"—"}</p><p><b>Pergunta — padrões visuais:</b> ${nl(state.close.questions.visual)||"—"}</p><p><b>Pergunta — ensaios:</b> ${nl(state.close.questions.tests)||"—"}</p><p><b>Pergunta — relatório:</b> ${nl(state.close.questions.report)||"—"}</p><p><b>Conferências:</b> reconciliação ${yesNo(state.close.reconciled)}; evidências separadas ${yesNo(state.close.separatedEvidence)}; limites aceitos ${yesNo(state.close.acceptedLimit)}; rastreabilidade tratada ${yesNo(state.close.traceabilityHandled)}.</p><p><b>Resumo:</b> ${nl(state.close.handoffSummary)||"—"}</p><p><b>Lacunas e limitações automáticas na exportação:</b></p><ul>${getGaps().map(gap=>`<li>${esc(gap)}</li>`).join("")||"<li>Nenhuma detectada automaticamente.</li>"}</ul></section>
+      <p style="font-size:11px;color:#667480">Gerado localmente em ${new Date().toLocaleString("pt-BR")}. O JSON estruturado completo está embutido abaixo.</p>
+      <script type="application/json" id="dados-inspecao">${json}<\/script>
+    </body></html>`;
+  }
+
+  function fileBase() {
+    return `Inspecao_Adidas_Camacari_${state.visit.date||today()}`;
+  }
+
+  function download(content,name,type) {
+    const url = URL.createObjectURL(new Blob([content],{type}));
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = name;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),2000);
+  }
+
+  async function exportHtml() {
+    const status = document.getElementById("export-status");
+    status.textContent = "Gerando pacote local…";
+    try {
+      const html = await buildHumanHtml();
+      download(html,fileBase()+".html","text/html;charset=utf-8");
+      status.textContent = `Pacote HTML gerado. Revise ${getGaps().length} lacuna(s) indicada(s) antes do envio.`;
+    } catch (error) {
+      status.textContent = "Não foi possível gerar o pacote. Os dados continuam salvos neste navegador.";
+    }
+  }
+
+  async function exportJson() {
+    const status = document.getElementById("export-status");
+    status.textContent = "Preparando JSON local…";
+    try {
+      const payload = await buildPayload();
+      download(JSON.stringify(payload,null,2),fileBase()+".json","application/json;charset=utf-8");
+      status.textContent = "JSON baixado com dados estruturados e miniaturas disponíveis.";
+    } catch (error) {
+      status.textContent = "Não foi possível gerar o JSON. Os dados continuam salvos neste navegador.";
+    }
+  }
+
+  document.addEventListener("input",event => {
+    const input = event.target;
+    if (input.matches("[data-path]")) {
+      setPath(input.dataset.path,input.type==="checkbox"?input.checked:input.value);
+      scheduleSave();
+      if (input.dataset.path.startsWith("safety.")) updateSafety();
+      if (input.dataset.path.startsWith("trace.")) updateTrace();
+      if (activeTab==="fechar") renderClose();
+      return;
+    }
+    if (input.matches("[data-list][data-id][data-field]")) {
+      const record = recordBy(input.dataset.list,input.dataset.id);
+      if (!record) return;
+      const target = input.dataset.nested ? (record[input.dataset.nested] ||= {}) : record;
+      target[input.dataset.field] = input.type==="checkbox"?input.checked:input.value;
+      scheduleSave();
+      return;
+    }
+    if (input.matches("[data-photo-caption]")) {
+      const root = input.closest(".photo-tools");
+      const record = recordBy(root.dataset.photoList,root.dataset.photoId);
+      const photo = record.photos.find(item => item.key===input.dataset.photoCaption);
+      if (photo) { photo.caption=input.value; scheduleSave(); }
+    }
+  });
+
+  document.addEventListener("change",event => {
+    const input = event.target;
+    if (input.matches("[data-photo-input]")) { handlePhotoInput(input); return; }
+    if (input.matches("[data-keep-thumbnails]")) {
+      const root = input.closest(".photo-tools");
+      const record = recordBy(root.dataset.photoList,root.dataset.photoId);
+      record.keepThumbnails = input.checked;
+      scheduleSave();
+    }
+  });
+
+  document.addEventListener("click",event => {
+    const tab = event.target.closest("[data-tab]");
+    if (tab) { switchTab(tab.dataset.tab); return; }
+    const action = event.target.closest("[data-action]");
+    if (action) {
+      const name = action.dataset.action;
+      if (name==="add-zone") addZone();
+      if (name==="add-equipment") addEquipment();
+      if (name==="add-finding") addFinding();
+      if (name==="export-html") exportHtml();
+      if (name==="export-json") exportJson();
+      if (name==="print") window.print();
+      return;
+    }
+    const counter = event.target.closest("[data-extra-photo]");
+    if (counter) {
+      const root = counter.closest(".photo-tools");
+      const record = recordBy(root.dataset.photoList,root.dataset.photoId);
+      record.extraPhotoCount = Math.max(0,(Number(record.extraPhotoCount)||0)+Number(counter.dataset.extraPhoto));
+      scheduleSave();
+      renderAllDynamic();
+    }
+  });
+
+  window.addEventListener("pagehide",flushSave);
+  document.addEventListener("visibilitychange",() => {
+    if (document.visibilityState==="hidden") flushSave();
+  });
+
+  let storageAvailable = true;
+  try { localStorage.setItem("__cam_test","1"); localStorage.removeItem("__cam_test"); } catch (error) { storageAvailable=false; }
+  hydrateStatic();
+  renderAllDynamic();
+  updateSafety();
+  updateTrace();
+  if (!storageAvailable) {
+    document.querySelector("main").insertAdjacentHTML("afterbegin",'<div class="banner danger"><strong>Salvamento local indisponível.</strong> Abra esta página no Safari/Chrome em modo normal antes de começar.</div>');
+  }
+  scheduleSave();
+  </script>
+</body>
+</html>
