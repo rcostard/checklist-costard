@@ -709,9 +709,9 @@
     const ready = safetyReady();
     const box = document.getElementById("safety-result");
     box.className = "banner " + (ready ? "ok" : "warn");
-    box.textContent = ready ? "Gate concluído. Prossiga sem ampliar o escopo." : "Gate pendente: confirme os quatro itens ou registre o impedimento e feche a visita.";
+    box.textContent = ready ? "Gate concluído. Prossiga sem ampliar o escopo." : "Gate pendente: a navegação continua disponível para registro, mas não execute atividades técnicas até confirmar os quatro itens. Se houver impedimento, registre-o e feche a visita.";
     document.querySelectorAll("[data-tab]").forEach(button => {
-      if (TECH_TABS.has(button.dataset.tab)) button.setAttribute("aria-disabled",String(!ready));
+      if (TECH_TABS.has(button.dataset.tab)) button.setAttribute("aria-disabled","false");
     });
   }
 
@@ -731,11 +731,6 @@
   }
 
   function switchTab(name) {
-    let blocked=false;
-    if (TECH_TABS.has(name) && !safetyReady()) {
-      name="inicio";
-      blocked=true;
-    }
     activeTab = name;
     document.querySelectorAll(".section").forEach(section => section.classList.toggle("active",section.dataset.section===name));
     document.querySelectorAll("[data-tab]").forEach(button => {
@@ -744,10 +739,7 @@
       if (on) button.setAttribute("aria-current","page"); else button.removeAttribute("aria-current");
     });
     if (name === "fechar") renderClose();
-    if (blocked) {
-      document.getElementById("safety-result").textContent = "Conclua o gate de segurança antes da etapa técnica.";
-      document.getElementById("safety-card").scrollIntoView({behavior:"smooth",block:"start"});
-    } else window.scrollTo({top:0,behavior:"smooth"});
+    window.scrollTo({top:0,behavior:"smooth"});
   }
 
   function nextId(prefix,list) {
