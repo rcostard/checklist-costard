@@ -127,7 +127,7 @@
     }
     .check-row:last-child { border-bottom:0; }
     .check-row input[type=checkbox] { width:24px; height:24px; margin:1px 0 0; flex:0 0 auto; accent-color:var(--teal); }
-    .check-row label { margin:0; font-size:14px; font-weight:600; }
+    .check-row label { display:flex; min-height:44px; flex-direction:column; justify-content:center; margin:0; font-size:14px; font-weight:600; }
     .check-row small { display:block; color:var(--muted); font-size:12px; font-weight:400; margin-top:2px; }
     details { border:1px solid var(--line); border-radius:12px; background:#fbfcfd; margin:10px 0; }
     summary { min-height:48px; padding:13px; color:var(--navy); cursor:pointer; font-weight:800; }
@@ -150,7 +150,7 @@
       border:0;
       border-radius:11px;
       padding:11px 15px;
-      background:var(--teal);
+      background:var(--teal-dark);
       color:#fff;
       font-weight:800;
       text-decoration:none;
@@ -161,10 +161,15 @@
     .btn.small { min-height:44px; padding:8px 12px; font-size:13px; }
     .btn:disabled { background:#b7c1c7; color:#fff; cursor:not-allowed; }
     .photo-tools { border-top:1px solid var(--line); margin-top:14px; padding-top:12px; }
+    .photo-route { margin:8px 0 12px; padding:11px 12px; border-radius:10px; background:#eef6f7; border-left:4px solid var(--teal-dark); font-size:13px; }
+    .photo-route b { color:var(--navy); }
+    .photo-route ol { margin:7px 0 3px; padding-left:23px; columns:2; column-gap:28px; }
+    .photo-route li { margin:4px 0; break-inside:avoid; }
     .photo-toolbar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
     .photo-input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
     .thumbs { display:grid; grid-template-columns:repeat(auto-fill,minmax(106px,1fr)); gap:8px; margin-top:10px; }
     .thumb { min-width:0; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:#f7f9fa; }
+    .photo-seq { display:block; padding:5px 7px; background:var(--navy); color:#fff; font-size:12px; letter-spacing:.03em; }
     .thumb img { display:block; width:100%; aspect-ratio:4/3; object-fit:cover; background:#e9eef1; }
     .thumb .no-thumb { display:flex; align-items:center; justify-content:center; width:100%; aspect-ratio:4/3; color:var(--muted); padding:8px; text-align:center; font-size:12px; }
     .thumb input { border:0; border-top:1px solid var(--line); border-radius:0; min-height:44px; font-size:12px; padding:7px; }
@@ -205,15 +210,16 @@
     .bottom-tabs button.active { color:var(--teal-dark); border-top-color:var(--teal); background:#f5fcfc; }
     .bottom-tabs button[aria-disabled=true] { color:#9ba5ac; }
     .sr-only { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important; }
-    @media (max-width:760px) {
+    @media (max-width:900px) {
       main { padding:10px; }
       .grid,.grid.three { grid-template-columns:1fr; gap:0; }
       .principles { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .reconcile { grid-template-columns:repeat(3,minmax(0,1fr)); }
       .bottom-tabs button { font-size:10px; }
       .visual-table td:first-child { width:40%; }
+      .photo-route ol { columns:1; }
     }
-    @media (min-width:900px) and (orientation:landscape) {
+    @media (min-width:901px) and (orientation:landscape) {
       .equipment-layout { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:14px; }
       .equipment-layout > .span-all { grid-column:1/-1; }
     }
@@ -392,6 +398,8 @@
       <article class="card">
         <h2>Reconciliação automática</h2>
         <div id="metrics" class="reconcile"></div>
+        <h3>Limitações conhecidas</h3>
+        <ul id="limitation-list" class="lacunas"></ul>
         <h3>Lacunas detectadas</h3>
         <ul id="gap-list" class="lacunas"></ul>
       </article>
@@ -402,6 +410,7 @@
           <div><label for="close-doc-received">Recebidos / fotografados</label><textarea id="close-doc-received" data-path="close.documentsReceived" placeholder="Nome, data/versão e origem"></textarea></div>
           <div><label for="close-doc-pending">Pendentes</label><textarea id="close-doc-pending" data-path="close.documentsPending" placeholder="OS anterior, PMOC, relatório de manutenção, fotos anteriores, alarmes, outros"></textarea></div>
           <div class="span-all"><label for="close-originals">Onde ficaram os originais de fotos/documentos?</label><textarea id="close-originals" data-path="close.originalsLocation" placeholder="Ex.: Fotos do iPad, pasta a enviar; não inclua credenciais ou links privados desnecessários"></textarea></div>
+          <div class="span-all"><label for="close-no-photos">Justificativa se não houver nenhuma foto</label><textarea id="close-no-photos" data-path="close.noPhotosReason" placeholder="Preencha somente se a visita terminar sem fotos: acesso, segurança, autorização ou outra causa objetiva"></textarea></div>
         </div>
       </article>
 
@@ -419,7 +428,7 @@
         <h2>Declarações de fechamento</h2>
         <fieldset>
           <legend>Conferência antes de exportar</legend>
-          <div class="check-row"><input id="close-reconciled" type="checkbox" data-path="close.reconciled"><label for="close-reconciled">Reconciliei ambientes, equipamentos, achados e faixas de fotos.<small>Itens não inspecionados permanecem explícitos; não foram apagados.</small></label></div>
+          <div class="check-row"><input id="close-reconciled" type="checkbox" data-path="close.reconciled"><label for="close-reconciled">Reconciliei ambientes, equipamentos, achados e o manifesto fotográfico.<small>Itens não inspecionados permanecem explícitos; não foram apagados.</small></label></div>
           <div class="check-row"><input id="close-facts" type="checkbox" data-path="close.separatedEvidence"><label for="close-facts">Mantive Fato, Relato, Interpretação e Hipótese separados.</label></div>
           <div class="check-row"><input id="close-limit" type="checkbox" data-path="close.acceptedLimit"><label for="close-limit">O pacote declara a ausência de medição independente de temperatura/UR e que a visita não determina ΔT, conforto quantitativo, vazamento ativo, carga, capacidade, desempenho frigorífico ou condenação.</label></div>
           <div class="check-row"><input id="close-trace" type="checkbox" data-path="close.traceabilityHandled"><label for="close-trace">A rastreabilidade foi demonstrada ou a insuficiência de identidade ficou expressa, sem alegar reincidência/material/serviço.</label></div>
@@ -448,6 +457,7 @@
   <template id="photo-widget-template">
     <div class="photo-tools">
       <div class="label">Registro fotográfico</div>
+      <div class="photo-route" data-photo-route></div>
       <div class="photo-toolbar">
         <label class="btn small">Abrir câmera
           <input class="photo-input" type="file" accept="image/*" capture="environment" data-photo-input>
@@ -455,15 +465,15 @@
         <label class="btn ghost small">Escolher da Fototeca
           <input class="photo-input" type="file" accept="image/*" multiple data-photo-input>
         </label>
-        <span class="photo-count" data-photo-range>sem fotos</span>
+        <span class="photo-count" data-photo-manifest>sem fotos</span>
       </div>
       <div class="check-row">
         <input type="checkbox" data-keep-thumbnails>
-        <label>Guardar miniaturas neste checklist<small>Opcional. Os arquivos originais não são enviados nem substituídos; confirme que ficaram preservados no iPad/câmera.</small></label>
+        <label data-thumbnail-label>Guardar miniaturas neste checklist<small>Opcional. Os arquivos originais não são enviados nem substituídos; confirme que ficaram preservados no iPad/câmera.</small></label>
       </div>
       <div class="photo-toolbar">
-        <span class="help">Fotos feitas fora do checklist, sem miniatura:</span>
-        <span class="counter-control"><button type="button" data-extra-photo="-1" aria-label="Diminuir contagem">−</button><output data-extra-count>0</output><button type="button" data-extra-photo="1" aria-label="Aumentar contagem">+</button></span>
+        <button class="btn ghost small" type="button" data-add-external-photo>+ Registrar foto externa sem miniatura</button>
+        <span class="help">Um toque por foto. Cada referência recebe um CAM-Fxxx definitivo e exige legenda.</span>
       </div>
       <div class="thumbs" data-thumbs></div>
     </div>
@@ -496,12 +506,25 @@
     ["not_seen","Não observado / acesso impedido"],
     ["na","Não aplicável"]
   ];
+  const PHOTO_ROUTES = {
+    equipment:["Identificação e ID do registro","Contexto e localização","Equipamento inteiro","Placa de identificação","Controlador / display com fonte e horário","Conexões e dreno","Achado em enquadramento amplo","Achado em detalhe"],
+    zones:["Identificação e ID do ambiente","Contexto geral da zona","Uso/ocupação no momento","Insuflação e retorno efetivamente visíveis","Relação espacial com o equipamento","Condição observada em visão ampla e detalhe"],
+    findings:["ID do achado e vínculo visível","Contexto que localiza a condição","Achado em enquadramento amplo","Achado em detalhe nítido","Relação com equipamento/ambiente","Fonte visual, display ou documento que sustenta o registro"]
+  };
+  const CODE_LABELS = {
+    ativo:"Ativo",nao_inspecionado:"Não inspecionado / acesso impedido",engano:"Criado por engano — mantido no histórico",
+    confirmed:"Confirmada fisicamente",different:"Divergente da referência",not_found:"Não localizado",na:"Não aplicável",
+    yes:"Sim — identidade demonstrada",no:"Não",indeterminate:"Indeterminado",
+    ok:"Sem alteração visual relevante",attention:"Alteração aparente",not_seen:"Não observado / acesso impedido",
+    none:"Não realizado",open_off:"Gabinete aberto desenergizado, isolado e autorizado",external:"Observação/medição externa sem exposição",other:"Outra ação excepcional autorizada"
+  };
 
   const esc = value => String(value ?? "").replace(/[&<>\"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[char]));
-  const today = () => new Date().toISOString().slice(0,10);
+  const today = () => { const date=new Date(); return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`; };
   const stamp = () => new Date().toISOString();
   const deepCopy = obj => JSON.parse(JSON.stringify(obj));
   const visualBlank = () => Object.fromEntries(VISUAL_ITEMS.map(([key]) => [key,""]));
+  const humanCode = value => CODE_LABELS[value] || value || "—";
 
   function baseEquipment(id,name,declaredCapacity,referenceNote,createdAt) {
     return {
@@ -525,6 +548,7 @@
       schema:SCHEMA,
       createdAt:stamp(),
       updatedAt:stamp(),
+      photoSequenceNext:1,
       visit:{inspector:"",date:today(),start:"",end:"",store:"Adidas — Camaçari",companion:"",purpose:"Coleta visual, operacional e documental para diagnóstico posterior do especialista.",arrivalContext:"",instrumentLimitations:"Termohigrômetro não disponível; sem medição independente de temperatura/UR."},
       safety:{localAuthorization:false,normalCommandsOnly:false,noLiveExposure:false,stopConditions:false,stopNote:""},
       interview:{source:"",schedule:"",currentComplaint:"",comfort:"",associatedSignals:"",normalControls:"",timeline:"",maintenance:"",failures:"",priorIntervention:"",documentsSeen:"",documentsPromised:""},
@@ -538,7 +562,7 @@
         sentinelEquipment("CAM-EQ05","Demais equipamentos / ativos","Registro sentinela: use “+ Adicionar equipamento” para cada ativo efetivamente encontrado.",base+5)
       ],
       findings:[],
-      close:{documentsReceived:"",documentsPending:"",originalsLocation:"",questions:{identity:"",visual:"",tests:"",report:""},reconciled:false,separatedEvidence:false,acceptedLimit:false,traceabilityHandled:false,handoffSummary:""}
+      close:{documentsReceived:"",documentsPending:"",originalsLocation:"",noPhotosReason:"",questions:{identity:"",visual:"",tests:"",report:""},reconciled:false,separatedEvidence:false,acceptedLimit:false,traceabilityHandled:false,handoffSummary:""}
     };
   }
 
@@ -572,6 +596,7 @@
     const sentinel = merged.equipment.find(record => record.id==="CAM-EQ05");
     if (sentinel) Object.assign(sentinel,{recordStatus:"nao_inspecionado",referenceOnly:false,referenceConfirmed:"na",sentinel:true});
     merged.findings.forEach(record => { normalizeRecord(record); record.trace=Object.assign({match:"",basis:""},record.trace||{}); });
+    normalizePhotoSequences(merged);
     return merged;
   }
 
@@ -582,6 +607,51 @@
     record.recordStatus = record.recordStatus || "ativo";
     record.createdAt = record.createdAt || Date.now();
   }
+
+  function photoRecordsOf(targetState) {
+    return [...targetState.zones,...targetState.equipment.filter(record=>!record.sentinel),...targetState.findings];
+  }
+
+  function normalizePhotoSequences(targetState) {
+    const records = photoRecordsOf(targetState);
+    const used = new Set();
+    const pending = [];
+    let next = Math.max(1,Number(targetState.photoSequenceNext)||1);
+    records.forEach(record => (record.photos||[]).forEach(photo => {
+      const seq = Number(photo.seq);
+      if (Number.isInteger(seq) && seq>0 && !used.has(seq)) {
+        photo.seq=seq; used.add(seq); next=Math.max(next,seq+1);
+      } else {
+        photo.seq=null; pending.push({record,photo});
+      }
+    }));
+    const takeNext = () => { while(used.has(next)) next++; const seq=next++; used.add(seq); return seq; };
+    pending.forEach(({record,photo}) => {
+      photo.seq=takeNext();
+      photo.key=photo.key || `migrated_${record.id}_${photo.seq}`;
+      photo.addedAt=photo.addedAt || targetState.updatedAt || targetState.createdAt || stamp();
+      photo.hasThumbnail=Boolean(photo.hasThumbnail);
+    });
+    records.forEach(record => {
+      const legacyCount=Math.max(0,Number(record.extraPhotoCount)||0);
+      for(let index=0;index<legacyCount;index++) {
+        const seq=takeNext();
+        record.photos.push({key:`external_${record.id}_${seq}`,seq,name:"Referência externa migrada",type:"external-reference",size:0,addedAt:targetState.updatedAt||stamp(),caption:"Foto externa migrada; completar legenda",hasThumbnail:false,external:true});
+      }
+      record.extraPhotoCount=0;
+    });
+    targetState.photoSequenceNext=next;
+  }
+
+  function allocatePhotoSequence() {
+    const used=new Set(allPhotoRecords().flatMap(record=>(record.photos||[]).map(photo=>Number(photo.seq)).filter(Number.isInteger)));
+    let seq=Math.max(1,Number(state.photoSequenceNext)||1);
+    while(used.has(seq)) seq++;
+    state.photoSequenceNext=seq+1;
+    return seq;
+  }
+
+  const photoId = seq => `CAM-F${String(Number(seq)||0).padStart(3,"0")}`;
 
   function persistNow(updateStatus=true) {
     const status = document.getElementById("save-status");
@@ -661,11 +731,10 @@
   }
 
   function switchTab(name) {
+    let blocked=false;
     if (TECH_TABS.has(name) && !safetyReady()) {
-      activeTab = "inicio";
-      document.getElementById("safety-card").scrollIntoView({behavior:"smooth",block:"start"});
-      document.getElementById("safety-result").textContent = "Conclua o gate de segurança antes da etapa técnica.";
-      return;
+      name="inicio";
+      blocked=true;
     }
     activeTab = name;
     document.querySelectorAll(".section").forEach(section => section.classList.toggle("active",section.dataset.section===name));
@@ -675,7 +744,10 @@
       if (on) button.setAttribute("aria-current","page"); else button.removeAttribute("aria-current");
     });
     if (name === "fechar") renderClose();
-    window.scrollTo({top:0,behavior:"smooth"});
+    if (blocked) {
+      document.getElementById("safety-result").textContent = "Conclua o gate de segurança antes da etapa técnica.";
+      document.getElementById("safety-card").scrollIntoView({behavior:"smooth",block:"start"});
+    } else window.scrollTo({top:0,behavior:"smooth"});
   }
 
   function nextId(prefix,list) {
@@ -905,21 +977,18 @@
   }
 
   function photoCount(record) {
-    return (record.photos||[]).length + Math.max(0,Number(record.extraPhotoCount)||0);
+    return (record.photos||[]).length;
   }
 
-  function photoRange(record) {
-    let first = 1;
-    for (const item of allPhotoRecords()) {
-      const count = photoCount(item);
-      if (item.id === record.id) {
-        if (!count) return "sem fotos";
-        const last = first + count - 1;
-        return count === 1 ? `foto ${String(first).padStart(3,"0")}` : `fotos ${String(first).padStart(3,"0")}–${String(last).padStart(3,"0")}`;
-      }
-      first += count;
-    }
-    return "sem fotos";
+  function photoManifest(record) {
+    const ids=(record.photos||[]).map(photo=>photoId(photo.seq));
+    return ids.length ? ids.join(" · ") : "sem fotos";
+  }
+
+  function photoRouteHtml(listName) {
+    const items=PHOTO_ROUTES[listName]||[];
+    const note=listName==="equipment" ? "Complete a sequência; se um elemento não existir fisicamente, registre a ausência no texto sem inventar foto N/A." : "Use as etapas que descrevem o ambiente/achado real; não force item N/A nem fotografe elemento inexistente.";
+    return `<b>Roteiro fotográfico obrigatório</b><ol>${items.map(item=>`<li>${esc(item)}</li>`).join("")}</ol><span class="help">${esc(note)} Cada foto deve receber legenda ligada ao seu CAM-Fxxx.</span>`;
   }
 
   function attachPhotoWidgets(scope) {
@@ -930,9 +999,13 @@
       const root = fragment.querySelector(".photo-tools");
       root.dataset.photoList = listName;
       root.dataset.photoId = record.id;
-      root.querySelector("[data-keep-thumbnails]").checked = record.keepThumbnails !== false;
-      root.querySelector("[data-extra-count]").textContent = record.extraPhotoCount||0;
-      root.querySelector("[data-photo-range]").textContent = photoRange(record);
+      const thumbnailToggle=root.querySelector("[data-keep-thumbnails]");
+      const thumbnailId=`thumb_${listName}_${record.id}`;
+      thumbnailToggle.id=thumbnailId;
+      thumbnailToggle.checked = record.keepThumbnails !== false;
+      root.querySelector("[data-thumbnail-label]").setAttribute("for",thumbnailId);
+      root.querySelector("[data-photo-route]").innerHTML=photoRouteHtml(listName);
+      root.querySelector("[data-photo-manifest]").textContent = photoManifest(record);
       host.appendChild(fragment);
       paintThumbs(root,record);
     });
@@ -941,9 +1014,13 @@
   async function paintThumbs(root,record) {
     const box = root.querySelector("[data-thumbs]");
     box.innerHTML = "";
-    for (const photo of record.photos||[]) {
+    for (const photo of [...(record.photos||[])].sort((a,b)=>(a.seq||0)-(b.seq||0))) {
       const item = document.createElement("div");
       item.className = "thumb";
+      const sequence=document.createElement("strong");
+      sequence.className="photo-seq";
+      sequence.textContent=photoId(photo.seq);
+      item.appendChild(sequence);
       if (photo.hasThumbnail) {
         const data = await thumbGet(photo.key);
         if (data) {
@@ -951,14 +1028,18 @@
           image.src = data;
           image.alt = photo.caption || `Miniatura ${photo.name||""}`;
           item.appendChild(image);
-        } else item.innerHTML = '<div class="no-thumb">Miniatura indisponível neste navegador</div>';
-      } else item.innerHTML = '<div class="no-thumb">Foto contada sem miniatura</div>';
+        } else {
+          const missing=document.createElement("div"); missing.className="no-thumb"; missing.textContent="Miniatura indisponível neste navegador"; item.appendChild(missing);
+        }
+      } else {
+        const external=document.createElement("div"); external.className="no-thumb"; external.textContent=photo.external?"Referência de foto externa":"Foto sem miniatura"; item.appendChild(external);
+      }
       const caption = document.createElement("input");
       caption.type = "text";
-      caption.placeholder = "Legenda / detalhe";
+      caption.placeholder = "Legenda obrigatória / detalhe";
       caption.value = photo.caption||"";
       caption.dataset.photoCaption = photo.key;
-      caption.setAttribute("aria-label","Legenda da foto");
+      caption.setAttribute("aria-label",`Legenda obrigatória de ${photoId(photo.seq)}`);
       item.appendChild(caption);
       box.appendChild(item);
     }
@@ -969,18 +1050,28 @@
     const record = recordBy(root.dataset.photoList,root.dataset.photoId);
     const files = Array.from(input.files||[]);
     if (!files.length) return;
-    const status = root.querySelector("[data-photo-range]");
+    const status = root.querySelector("[data-photo-manifest]");
     status.textContent = "processando…";
     for (const file of files) {
-      const key = record.id + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
-      let hasThumbnail = false;
+      const seq=allocatePhotoSequence();
+      const key = record.id + "_" + seq + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+      const photo={key,seq,name:file.name||"captura",type:file.type||"image",size:file.size||0,addedAt:stamp(),caption:"",hasThumbnail:false,external:false};
+      record.photos.push(photo);
+      scheduleSave();
       if (record.keepThumbnails !== false) {
         const data = await makeThumbnail(file);
-        if (data) hasThumbnail = await thumbPut(key,data);
+        if (data) photo.hasThumbnail = await thumbPut(key,data);
       }
-      record.photos.push({key,name:file.name||"captura",type:file.type||"image",size:file.size||0,addedAt:stamp(),caption:"",hasThumbnail});
     }
     input.value = "";
+    scheduleSave();
+    renderAllDynamic();
+  }
+
+  function addExternalPhotoReference(root) {
+    const record=recordBy(root.dataset.photoList,root.dataset.photoId);
+    const seq=allocatePhotoSequence();
+    record.photos.push({key:`external_${record.id}_${seq}`,seq,name:"Referência de foto externa",type:"external-reference",size:0,addedAt:stamp(),caption:"",hasThumbnail:false,external:true});
     scheduleSave();
     renderAllDynamic();
   }
@@ -992,14 +1083,23 @@
     if (activeTab === "fechar") renderClose();
   }
 
+  function getLimitations() {
+    return [
+      state.visit.instrumentLimitations||"Termohigrômetro não disponível; sem medição independente de temperatura/UR.",
+      "Valores de termostato/BMS são apenas indicação do equipamento; não constituem medição independente.",
+      "Sem ΔT, conforto quantitativo, capacidade ou desempenho apurado nesta visita.",
+      "A visita não prova vazamento ativo nem determina carga de refrigerante.",
+      "A visita não sustenta condenação de equipamento por si só.",
+      "Sem identidade física, não há base para alegar reincidência ou atribuir material/serviço anterior."
+    ];
+  }
+
   function getGaps() {
     const gaps = [];
     if (!safetyReady()) gaps.push("Gate de segurança incompleto ou visita encerrada antes da inspeção técnica.");
     if (!state.visit.inspector.trim()) gaps.push("Inspetor não identificado.");
     if (!state.visit.start) gaps.push("Horário de início não registrado.");
-    const instrumentLimit = String(state.visit.instrumentLimitations||"").trim();
-    if (instrumentLimit) gaps.push(`Limitação instrumental declarada: ${instrumentLimit}`);
-    else gaps.push("Instrumentos disponíveis e limitações da visita não foram registrados.");
+    if (!state.visit.end) gaps.push("Horário de término da visita não registrado.");
     if (!state.zones.length) gaps.push("Nenhum ambiente/zona registrado.");
     const activeEquipment = state.equipment.filter(item => item.recordStatus==="ativo" && !item.sentinel);
     const pendingRefs = activeEquipment.filter(item => item.referenceOnly && !item.referenceConfirmed);
@@ -1012,9 +1112,17 @@
     if (sparseFindings.length) gaps.push(`${sparseFindings.length} achado(s) sem fato nem relato registrado.`);
     const unlocated = state.findings.filter(item => item.recordStatus==="ativo" && !item.location.trim() && !item.zoneId && !item.equipmentId);
     if (unlocated.length) gaps.push(`${unlocated.length} achado(s) sem localização ou vínculo.`);
+    const photos=allPhotoRecords().flatMap(record=>record.photos||[]);
+    if (!photos.length && !String(state.close.noPhotosReason||"").trim()) gaps.push("Nenhuma foto registrada e nenhuma justificativa informada.");
+    if (photos.length && !String(state.close.originalsLocation||"").trim()) gaps.push("Há fotos registradas, mas a localização dos originais não foi informada.");
+    const photosWithoutCaption=photos.filter(photo=>!String(photo.caption||"").trim());
+    if (photosWithoutCaption.length) gaps.push(`${photosWithoutCaption.length} foto(s) do manifesto sem legenda.`);
     if (!state.close.documentsPending.trim() && !state.close.documentsReceived.trim()) gaps.push("Situação dos documentos não reconciliada.");
+    if (!state.close.reconciled) gaps.push("Reconciliação de ambientes, equipamentos, achados e manifesto fotográfico não confirmada.");
+    if (!state.close.separatedEvidence) gaps.push("Separação entre Fato, Relato, Interpretação e Hipótese não confirmada.");
     if (!state.close.acceptedLimit) gaps.push("Declaração de limites da visita ainda não conferida.");
     if (!state.close.traceabilityHandled) gaps.push("Tratamento da rastreabilidade ainda não conferido no fechamento.");
+    if (!String(state.close.handoffSummary||"").trim()) gaps.push("Resumo de passagem ao especialista não preenchido.");
     return gaps;
   }
 
@@ -1028,8 +1136,10 @@
       <div class="metric"><b>${activeZones}</b>ambientes</div>
       <div class="metric"><b>${activeEquipment}</b>equipamentos</div>
       <div class="metric"><b>${activeFindings}</b>achados</div>
-      <div class="metric"><b>${photos}</b>fotos contadas</div>
+      <div class="metric"><b>${photos}</b>fotos registradas</div>
       <div class="metric"><b>${confirmedRefs}</b>refs. confirmadas</div>`;
+    const limitations=getLimitations();
+    document.getElementById("limitation-list").innerHTML=limitations.map(item=>`<li>${esc(item)}</li>`).join("");
     const gaps = getGaps();
     document.getElementById("gap-list").innerHTML = gaps.length ? gaps.map(gap=>`<li>${esc(gap)}</li>`).join("") : "<li>Nenhuma lacuna automática detectada; ainda revise qualitativamente o pacote.</li>";
   }
@@ -1045,7 +1155,7 @@
         }
       }
     }
-    return {schema:SCHEMA,exportedAt:stamp(),limitations:[state.visit.instrumentLimitations||"Termohigrômetro não disponível; sem medição independente de temperatura/UR.","Valores de termostato/BMS são apenas indicação do equipamento; não constituem medição independente.","Sem ΔT, conforto quantitativo, capacidade ou desempenho apurado nesta visita.","A visita não prova vazamento ativo.","A visita não determina carga de refrigerante.","A visita não comprova desempenho frigorífico.","A visita não sustenta condenação de equipamento por si só.","Sem identidade física, não há base para alegar reincidência ou atribuir material/serviço anterior."],data:copy,thumbnails};
+    return {schema:SCHEMA,exportedAt:stamp(),limitations:getLimitations(),gaps:getGaps(),data:copy,thumbnails};
   }
 
   function exportEvidence(record) {
@@ -1055,30 +1165,30 @@
   const nl = value => esc(value||"").replace(/\n/g,"<br>");
 
   function exportPhotoBlock(record,payload) {
-    const images = (record.photos||[]).map(photo => payload.thumbnails[photo.key] ? `<figure><img src="${payload.thumbnails[photo.key]}" alt="${esc(photo.caption||photo.name||"Foto")}"><figcaption>${esc(photo.caption||photo.name||"Sem legenda")}</figcaption></figure>` : `<div class="photo-ref">Foto sem miniatura: ${esc(photo.caption||photo.name||"registro")}</div>`).join("");
-    return `<p><b>Faixa automática:</b> ${esc(photoRange(record))}</p>${images?`<div class="photos">${images}</div>`:""}`;
+    const images = [...(record.photos||[])].sort((a,b)=>(a.seq||0)-(b.seq||0)).map(photo => payload.thumbnails[photo.key] ? `<figure><img src="${payload.thumbnails[photo.key]}" alt="${esc(photo.caption||photo.name||"Foto")}"><figcaption><b>${esc(photoId(photo.seq))}</b> — ${esc(photo.caption||photo.name||"Sem legenda")}</figcaption></figure>` : `<div class="photo-ref"><b>${esc(photoId(photo.seq))}</b> — ${esc(photo.caption||photo.name||"sem legenda")} ${photo.external?"(original externo)":"(sem miniatura)"}</div>`).join("");
+    return `<p><b>Manifesto fotográfico imutável:</b> ${esc(photoManifest(record))}</p>${images?`<div class="photos">${images}</div>`:""}`;
   }
 
   async function buildHumanHtml() {
     const payload = await buildPayload();
     const yesNo = value => value ? "Sim" : "Não";
     const visitAndSafety = `<section><h2>Visita, instrumentos e segurança</h2><p><b>Objetivo:</b> ${nl(state.visit.purpose)||"—"}</p><p><b>Condições de chegada:</b> ${nl(state.visit.arrivalContext)||"—"}</p><p><b>Instrumentos e limitações:</b> ${nl(state.visit.instrumentLimitations)||"—"}</p><p><b>Gate:</b> autorização local ${yesNo(state.safety.localAuthorization)}; somente comandos normais ${yesNo(state.safety.normalCommandsOnly)}; sem exposição a partes vivas ${yesNo(state.safety.noLiveExposure)}; condições de parada entendidas ${yesNo(state.safety.stopConditions)}.</p><p><b>Condição insegura / impedimento / encerramento:</b> ${nl(state.safety.stopNote)||"—"}</p></section>`;
-    const interview = `<section><h2>Entrevista e rastreabilidade</h2><p><b>Fonte:</b> ${esc(state.interview.source||"—")} · <b>Rotina:</b> ${nl(state.interview.schedule)||"—"}</p><p><b>Queixa atual:</b> ${nl(state.interview.currentComplaint)||"—"}</p><p><b>Conforto e distribuição relatados:</b> ${nl(state.interview.comfort)||"—"}</p><p><b>Sinais associados:</b> ${nl(state.interview.associatedSignals)||"—"}</p><p><b>Comandos/setpoints usuais:</b> ${nl(state.interview.normalControls)||"—"}</p><p><b>Cronologia:</b> ${nl(state.interview.timeline)||"—"}</p><p><b>Manutenção:</b> ${nl(state.interview.maintenance)||"—"}</p><p><b>Falhas/alarmes:</b> ${nl(state.interview.failures)||"—"}</p><p><b>Intervenção anterior:</b> ${nl(state.interview.priorIntervention)||"—"}</p><p><b>Documentos vistos/recebidos:</b> ${nl(state.interview.documentsSeen)||"—"}</p><p><b>Documentos solicitados/prometidos:</b> ${nl(state.interview.documentsPromised)||"—"}</p><p><b>Identidade anterior:</b> ${nl(state.trace.priorIdentity)||"—"}<br><b>Identidade atual:</b> ${nl(state.trace.currentIdentity)||"—"}<br><b>Correspondência:</b> ${esc(state.trace.match||"não avaliada")}<br><b>Fonte documental:</b> ${nl(state.trace.sourceReference)||"—"}<br><b>Base objetiva:</b> ${nl(state.trace.matchBasis)||"—"}</p></section>`;
-    const zones = state.zones.map(record => `<section><h2>${esc(record.id)} — ${esc(record.name||"Ambiente sem nome")}</h2><p><b>Situação:</b> ${esc(record.recordStatus)} · <b>Tipo:</b> ${esc(record.type)} · <b>Local:</b> ${esc(record.location)}</p><p><b>Uso/ocupação:</b> ${nl(record.occupancy)||"—"}</p><p><b>Equipamentos que parecem atender:</b> ${nl(record.servedBy)||"—"}</p><p><b>Condição percebida — somente comparativa:</b> ${nl(record.conditions)||"—"}</p><p><b>Insuflação/retorno:</b> ${nl(record.supplyReturn)||"—"}</p><p><b>Obstruções:</b> ${nl(record.obstructions)||"—"}</p><p><b>Umidade/água/odor:</b> ${nl(record.moisture)||"—"}</p>${exportEvidence(record)}${exportPhotoBlock(record,payload)}</section>`).join("");
+    const interview = `<section><h2>Entrevista e rastreabilidade</h2><p><b>Fonte:</b> ${esc(state.interview.source||"—")} · <b>Rotina:</b> ${nl(state.interview.schedule)||"—"}</p><p><b>Queixa atual:</b> ${nl(state.interview.currentComplaint)||"—"}</p><p><b>Conforto e distribuição relatados:</b> ${nl(state.interview.comfort)||"—"}</p><p><b>Sinais associados:</b> ${nl(state.interview.associatedSignals)||"—"}</p><p><b>Comandos/setpoints usuais:</b> ${nl(state.interview.normalControls)||"—"}</p><p><b>Cronologia:</b> ${nl(state.interview.timeline)||"—"}</p><p><b>Manutenção:</b> ${nl(state.interview.maintenance)||"—"}</p><p><b>Falhas/alarmes:</b> ${nl(state.interview.failures)||"—"}</p><p><b>Intervenção anterior:</b> ${nl(state.interview.priorIntervention)||"—"}</p><p><b>Documentos vistos/recebidos:</b> ${nl(state.interview.documentsSeen)||"—"}</p><p><b>Documentos solicitados/prometidos:</b> ${nl(state.interview.documentsPromised)||"—"}</p><p><b>Identidade anterior:</b> ${nl(state.trace.priorIdentity)||"—"}<br><b>Identidade atual:</b> ${nl(state.trace.currentIdentity)||"—"}<br><b>Correspondência:</b> ${esc(humanCode(state.trace.match))}<br><b>Fonte documental:</b> ${nl(state.trace.sourceReference)||"—"}<br><b>Base objetiva:</b> ${nl(state.trace.matchBasis)||"—"}</p></section>`;
+    const zones = state.zones.map(record => `<section><h2>${esc(record.id)} — ${esc(record.name||"Ambiente sem nome")}</h2><p><b>Situação:</b> ${esc(humanCode(record.recordStatus))} · <b>Tipo:</b> ${esc(record.type)} · <b>Local:</b> ${esc(record.location)}</p><p><b>Uso/ocupação:</b> ${nl(record.occupancy)||"—"}</p><p><b>Equipamentos que parecem atender:</b> ${nl(record.servedBy)||"—"}</p><p><b>Condição percebida — somente comparativa:</b> ${nl(record.conditions)||"—"}</p><p><b>Insuflação/retorno:</b> ${nl(record.supplyReturn)||"—"}</p><p><b>Obstruções:</b> ${nl(record.obstructions)||"—"}</p><p><b>Umidade/água/odor:</b> ${nl(record.moisture)||"—"}</p>${exportEvidence(record)}${exportPhotoBlock(record,payload)}</section>`).join("");
     const sentinelNote = state.equipment.some(record=>record.sentinel) ? '<div class="meta"><b>CAM-EQ05:</b> sentinela administrativa para lembrar o inventário de outros ativos. Não contabilizada nem apresentada como equipamento real.</div>' : "";
-    const equipment = state.equipment.filter(record=>!record.sentinel).map(record => `<section><h2>${esc(record.id)} — ${esc(record.name||"Equipamento sem nome")}</h2><p><b>Situação:</b> ${esc(record.recordStatus)} · <b>Referência:</b> ${record.referenceOnly?"pré-campo":"incluído em campo"} · <b>Confirmação:</b> ${esc(record.referenceConfirmed||"pendente")}</p><p><b>Referência/nota de origem:</b> ${nl(record.referenceNote)||"—"}</p><p><b>Identidade:</b> fabricante ${esc(record.manufacturer||"—")}; modelo ${esc(record.model||"—")}; série ${esc(record.serial||"—")}; TAG ${esc(record.tag||"—")}.</p><p><b>Capacidade indicada antes da visita:</b> ${esc(record.declaredCapacity||"—")} · <b>Capacidade lida na placa:</b> ${esc(record.plateCapacity||"—")}</p><p><b>Local / zona / associação:</b> ${nl(record.location)||"—"} · ${esc(record.zoneId||"sem vínculo")} · ${nl(record.association)||"—"}</p><table><thead><tr><th>Verificação visual</th><th>Registro</th></tr></thead><tbody>${VISUAL_ITEMS.map(([key,label])=>`<tr><td>${esc(label)}</td><td>${esc(record.visual[key]||"não avaliado")}</td></tr>`).join("")}</tbody></table><p><b>Notas visuais:</b> ${nl(record.visualNotes)||"—"}</p><p><b>Operação:</b> ${esc(record.operatingState||"—")} · ${nl(record.normalCommandObserved)||"—"}<br><b>Display/alarme/setpoint indicado:</b> ${nl(record.displayAlarm)||"—"}</p>${exportEvidence(record)}<p><b>Exceção — decisão:</b> ${esc(record.exception.mode||"none")}<br><b>Motivo:</b> ${nl(record.exception.reason)||"—"}<br><b>Autorização:</b> ${nl(record.exception.authorization)||"—"}<br><b>Desenergização/bloqueio/condição segura:</b> ${nl(record.exception.isolation)||"—"}<br><b>Ação efetiva:</b> ${nl(record.exception.action)||"—"}<br><b>Leitura/unidade/ponto:</b> ${nl(record.exception.reading)||"—"}<br><b>Condição operacional:</b> ${nl(record.exception.conditions)||"—"}</p>${exportPhotoBlock(record,payload)}</section>`).join("");
-    const findings = state.findings.map(record => `<section><h2>${esc(record.id)} — ${esc(record.title||"Achado sem título")}</h2><p><b>Situação:</b> ${esc(record.recordStatus)} · <b>Local:</b> ${esc(record.location||"—")} · <b>Vínculos:</b> ${esc(record.zoneId||"—")} / ${esc(record.equipmentId||"—")}</p><p><b>Natureza:</b> ${esc(record.category)} · <b>Triagem:</b> ${esc(record.urgency)}</p>${exportEvidence(record)}<p><b>Limitações:</b> ${nl(record.limitations)||"—"}</p><p><b>Rastreabilidade:</b> ${esc(record.trace.match||"não avaliada")} — ${nl(record.trace.basis)||"sem base registrada"}</p><p><b>Ação segura:</b> ${nl(record.safeAction)||"—"}</p>${exportPhotoBlock(record,payload)}</section>`).join("");
+    const equipment = state.equipment.filter(record=>!record.sentinel).map(record => `<section><h2>${esc(record.id)} — ${esc(record.name||"Equipamento sem nome")}</h2><p><b>Situação:</b> ${esc(humanCode(record.recordStatus))} · <b>Referência:</b> ${record.referenceOnly?"pré-campo":"incluído em campo"} · <b>Confirmação:</b> ${esc(humanCode(record.referenceConfirmed)||"Pendente")}</p><p><b>Referência/nota de origem:</b> ${nl(record.referenceNote)||"—"}</p><p><b>Identidade:</b> fabricante ${esc(record.manufacturer||"—")}; modelo ${esc(record.model||"—")}; série ${esc(record.serial||"—")}; TAG ${esc(record.tag||"—")}.</p><p><b>Capacidade indicada antes da visita:</b> ${esc(record.declaredCapacity||"—")} · <b>Capacidade lida na placa:</b> ${esc(record.plateCapacity||"—")}</p><p><b>Local / zona / associação:</b> ${nl(record.location)||"—"} · ${esc(record.zoneId||"sem vínculo")} · ${nl(record.association)||"—"}</p><table><thead><tr><th>Verificação visual</th><th>Registro</th></tr></thead><tbody>${VISUAL_ITEMS.map(([key,label])=>`<tr><td>${esc(label)}</td><td>${esc(humanCode(record.visual[key]||"Não avaliado"))}</td></tr>`).join("")}</tbody></table><p><b>Notas visuais:</b> ${nl(record.visualNotes)||"—"}</p><p><b>Operação:</b> ${esc(record.operatingState||"—")} · ${nl(record.normalCommandObserved)||"—"}<br><b>Display/alarme/setpoint indicado:</b> ${nl(record.displayAlarm)||"—"}</p>${exportEvidence(record)}<p><b>Exceção — decisão:</b> ${esc(humanCode(record.exception.mode))}<br><b>Motivo:</b> ${nl(record.exception.reason)||"—"}<br><b>Autorização:</b> ${nl(record.exception.authorization)||"—"}<br><b>Desenergização/bloqueio/condição segura:</b> ${nl(record.exception.isolation)||"—"}<br><b>Ação efetiva:</b> ${nl(record.exception.action)||"—"}<br><b>Leitura/unidade/ponto:</b> ${nl(record.exception.reading)||"—"}<br><b>Condição operacional:</b> ${nl(record.exception.conditions)||"—"}</p>${exportPhotoBlock(record,payload)}</section>`).join("");
+    const findings = state.findings.map(record => `<section><h2>${esc(record.id)} — ${esc(record.title||"Achado sem título")}</h2><p><b>Situação:</b> ${esc(humanCode(record.recordStatus))} · <b>Local:</b> ${esc(record.location||"—")} · <b>Vínculos:</b> ${esc(record.zoneId||"—")} / ${esc(record.equipmentId||"—")}</p><p><b>Natureza:</b> ${esc(record.category)} · <b>Triagem:</b> ${esc(record.urgency)}</p>${exportEvidence(record)}<p><b>Limitações:</b> ${nl(record.limitations)||"—"}</p><p><b>Rastreabilidade:</b> ${esc(humanCode(record.trace.match))} — ${nl(record.trace.basis)||"sem base registrada"}</p><p><b>Ação segura:</b> ${nl(record.safeAction)||"—"}</p>${exportPhotoBlock(record,payload)}</section>`).join("");
     const json = JSON.stringify(payload).replace(/</g,"\\u003c");
     return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pacote de inspeção Camaçari ${esc(state.visit.date)}</title><style>body{font-family:Arial,sans-serif;color:#24313d;max-width:1100px;margin:24px auto;padding:0 18px;line-height:1.4}h1{color:#1d3563}h2{color:#1d3563;border-bottom:2px solid #00a0ac;padding-bottom:4px}section{break-inside:avoid;margin:22px 0}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccd6dc;padding:6px;text-align:left}th{background:#1d3563;color:#fff}dl{display:grid;grid-template-columns:130px 1fr;margin:10px 0}dt,dd{border-top:1px solid #dce3e7;padding:6px;margin:0}dt{font-weight:bold;color:#1d3563}.limit{background:#fff0f0;border-left:5px solid #a32828;padding:12px}.meta{background:#edf7f8;padding:12px;border-radius:8px}.photos{display:flex;flex-wrap:wrap;gap:8px}.photos figure{margin:0;width:180px}.photos img{width:180px;height:135px;object-fit:cover;border:1px solid #bbb;border-radius:6px}.photos figcaption{font-size:11px}.photo-ref{font-size:12px;color:#667480}@media print{body{margin:0;max-width:none}section{break-inside:avoid}}</style></head><body>
       <h1>COSTARD — Pacote de inspeção HVAC</h1>
       <div class="meta"><b>Projeto:</b> 052 · <b>Unidade:</b> ${esc(state.visit.store)} · <b>Data:</b> ${esc(state.visit.date)} ${esc(state.visit.start)}–${esc(state.visit.end)} · <b>Inspetor:</b> ${esc(state.visit.inspector)} · <b>Acompanhante:</b> ${esc(state.visit.companion)}</div>
-      <div class="limit"><b>Limites:</b> ${nl(state.visit.instrumentLimitations)||"Termohigrômetro não disponível; sem medição independente de temperatura/UR."} Valores de termostato/BMS são somente indicações do equipamento. Não houve base para ΔT, conforto quantitativo, capacidade ou desempenho. A visita não prova vazamento ativo, carga de refrigerante ou condenação. Sem identidade física, não prova reincidência nem permite atribuir material, método ou serviço anterior.</div>
+      <div class="limit"><b>Limitações conhecidas</b><ul>${getLimitations().map(item=>`<li>${esc(item)}</li>`).join("")}</ul></div>
       ${visitAndSafety}
       ${interview}
       <h1>Ambientes</h1>${zones||"<p>Nenhum ambiente registrado.</p>"}
       <h1>Equipamentos</h1>${sentinelNote}${equipment||"<p>Nenhum equipamento real registrado.</p>"}
       <h1>Achados</h1>${findings||"<p>Nenhum achado registrado.</p>"}
-      <section><h2>Fechamento e passagem para Raul / especialista</h2><p><b>Documentos recebidos:</b> ${nl(state.close.documentsReceived)||"—"}</p><p><b>Documentos pendentes:</b> ${nl(state.close.documentsPending)||"—"}</p><p><b>Originais:</b> ${nl(state.close.originalsLocation)||"—"}</p><p><b>Pergunta — identidade:</b> ${nl(state.close.questions.identity)||"—"}</p><p><b>Pergunta — padrões visuais:</b> ${nl(state.close.questions.visual)||"—"}</p><p><b>Pergunta — ensaios:</b> ${nl(state.close.questions.tests)||"—"}</p><p><b>Pergunta — relatório:</b> ${nl(state.close.questions.report)||"—"}</p><p><b>Conferências:</b> reconciliação ${yesNo(state.close.reconciled)}; evidências separadas ${yesNo(state.close.separatedEvidence)}; limites aceitos ${yesNo(state.close.acceptedLimit)}; rastreabilidade tratada ${yesNo(state.close.traceabilityHandled)}.</p><p><b>Resumo:</b> ${nl(state.close.handoffSummary)||"—"}</p><p><b>Lacunas e limitações automáticas na exportação:</b></p><ul>${getGaps().map(gap=>`<li>${esc(gap)}</li>`).join("")||"<li>Nenhuma detectada automaticamente.</li>"}</ul></section>
+      <section><h2>Fechamento e passagem para Raul / especialista</h2><p><b>Documentos recebidos:</b> ${nl(state.close.documentsReceived)||"—"}</p><p><b>Documentos pendentes:</b> ${nl(state.close.documentsPending)||"—"}</p><p><b>Originais:</b> ${nl(state.close.originalsLocation)||"—"}</p><p><b>Justificativa de ausência total de fotos:</b> ${nl(state.close.noPhotosReason)||"—"}</p><p><b>Pergunta — identidade:</b> ${nl(state.close.questions.identity)||"—"}</p><p><b>Pergunta — padrões visuais:</b> ${nl(state.close.questions.visual)||"—"}</p><p><b>Pergunta — ensaios:</b> ${nl(state.close.questions.tests)||"—"}</p><p><b>Pergunta — relatório:</b> ${nl(state.close.questions.report)||"—"}</p><p><b>Conferências:</b> reconciliação ${yesNo(state.close.reconciled)}; evidências separadas ${yesNo(state.close.separatedEvidence)}; limites aceitos ${yesNo(state.close.acceptedLimit)}; rastreabilidade tratada ${yesNo(state.close.traceabilityHandled)}.</p><p><b>Resumo:</b> ${nl(state.close.handoffSummary)||"—"}</p><p><b>Lacunas automáticas na exportação:</b></p><ul>${getGaps().map(gap=>`<li>${esc(gap)}</li>`).join("")||"<li>Nenhuma detectada automaticamente.</li>"}</ul></section>
       <p style="font-size:11px;color:#667480">Gerado localmente em ${new Date().toLocaleString("pt-BR")}. O JSON estruturado completo está embutido abaixo.</p>
       <script type="application/json" id="dados-inspecao">${json}<\/script>
     </body></html>`;
@@ -1174,13 +1284,9 @@
       if (name==="print") window.print();
       return;
     }
-    const counter = event.target.closest("[data-extra-photo]");
-    if (counter) {
-      const root = counter.closest(".photo-tools");
-      const record = recordBy(root.dataset.photoList,root.dataset.photoId);
-      record.extraPhotoCount = Math.max(0,(Number(record.extraPhotoCount)||0)+Number(counter.dataset.extraPhoto));
-      scheduleSave();
-      renderAllDynamic();
+    const externalPhoto = event.target.closest("[data-add-external-photo]");
+    if (externalPhoto) {
+      addExternalPhotoReference(externalPhoto.closest(".photo-tools"));
     }
   });
 
